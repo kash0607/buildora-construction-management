@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — BUILDORA Construction Project Operations</title>
+  <meta name="description" content="Manage construction projects, site reports, procurement, and costs.">
+
+  <!-- Core & Component Stylesheets -->
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/forms.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+
+  <!-- Chart.js for data visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body data-page="dashboard">
+
+  <div class="app-wrapper">
+    <!-- Dynamic Injected Sidebar -->
+    <aside id="app-sidebar" class="app-sidebar"></aside>
+
+    <!-- Main Content Container -->
+    <div class="app-main">
+      <!-- Dynamic Injected Navbar -->
+      <header id="app-navbar" class="app-navbar"></header>
+
+      <!-- Dashboard View Content -->
+      <main class="page-content">
+        <div class="content-container">
+
+          <!-- Welcome Banner with Wix-inspired Earthy Aesthetic -->
+          <section class="welcome-banner">
+            <div class="welcome-content">
+              <div class="welcome-date">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                Wednesday, 02 September 2026
+              </div>
+              <h2 class="welcome-title">Good Morning, Kashish</h2>
+              <p class="welcome-subtitle">
+                12 active construction sites are operational today. 5 urgent purchase requests require your sign-off before 2:00 PM.
+              </p>
+            </div>
+
+            <div class="welcome-actions">
+              <button class="btn btn-secondary btn-sm" onclick="window.dashboard.openModal('create-project-modal')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+                New Project
+              </button>
+              <button class="btn btn-accent btn-sm" onclick="window.dashboard.openModal('quick-report-modal')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" x2="12" y1="12" y2="18"/><line x1="9" x2="15" y1="15" y2="15"/></svg>
+                Daily Site Log
+              </button>
+              <button class="btn btn-outline btn-sm" style="background: rgba(255,255,255,0.15); color: var(--color-white); border-color: rgba(255,255,255,0.3);" onclick="window.dashboard.openModal('quick-po-modal')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                Purchase Request
+              </button>
+            </div>
+          </section>
+
+          <!-- 6 Key Performance Indicators (KPIs) -->
+          <section id="kpi-cards-grid" class="kpi-grid">
+            <!-- Dynamic Content populated by DashboardController -->
+          </section>
+
+          <!-- Visual Analytics Charts (2 Columns) -->
+          <section class="charts-grid">
+            <!-- Left Chart: Monthly Budget vs Actual Expenses -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+                    Monthly Budget vs. Actual Expenditure
+                  </div>
+                  <div class="card-subtitle">Values tracked in Crores (INR) across active fiscal quarters</div>
+                </div>
+                <div class="badge badge-neutral badge-no-dot">FY 2026-27</div>
+              </div>
+              <div class="card-body">
+                <div class="chart-container-box">
+                  <canvas id="expenseTrendsChart"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Chart: Project Portfolio Health -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Project Progress</div>
+                  <div class="card-subtitle">Status across all registered projects</div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="chart-container-box">
+                  <canvas id="projectHealthChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Secondary Operations Grid (Projects, Milestones, Approvals, Site Feed) -->
+          <section class="dashboard-sections-grid">
+            
+            <!-- Left Column: Active Projects Table & Site Feed -->
+            <div class="flex-col gap-6">
+              <!-- Recent Projects Card -->
+              <div class="card">
+                <div class="card-header">
+                  <div>
+                    <div class="card-title">Recent Projects</div>
+                    <div class="card-subtitle">Project completion status and budget tracking</div>
+                  </div>
+                  <a href="projects.html" class="btn btn-ghost btn-sm font-semibold text-primary">View All Projects →</a>
+                </div>
+                <div class="table-wrapper" style="border: none;">
+                  <table class="table-custom">
+                    <thead>
+                      <tr>
+                        <th>Project & Client</th>
+                        <th>Site Lead</th>
+                        <th>Progress</th>
+                        <th>Budget</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="recent-projects-tbody">
+                      <!-- Populated dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Live Site Operations Feed -->
+              <div class="card">
+                <div class="card-header">
+                  <div>
+                    <div class="card-title">Recent Site Reports</div>
+                    <div class="card-subtitle">Supervisor field updates submitted in the last 24 hours</div>
+                  </div>
+                  <a href="site-reports.html" class="btn btn-ghost btn-sm font-semibold text-primary">All Reports →</a>
+                </div>
+                <div class="card-body" id="site-activity-container">
+                  <!-- Populated dynamically -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column: Urgent Approvals, Upcoming Milestones, Low Stock -->
+            <div class="flex-col gap-6">
+              
+              <!-- Urgent Pending Approvals -->
+              <div class="card">
+                <div class="card-header">
+                  <div>
+                    <div class="card-title">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-warning);"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                      Urgent Approvals
+                    </div>
+                    <div class="card-subtitle">Purchase orders & expense claims awaiting PM approval</div>
+                  </div>
+                  <a href="approvals.html" class="btn btn-ghost btn-sm font-semibold text-primary">See All</a>
+                </div>
+                <div class="card-body">
+                  <div class="approval-list" id="pending-approvals-list">
+                    <!-- Populated dynamically -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- Upcoming Milestones Timeline -->
+              <div class="card">
+                <div class="card-header">
+                  <div>
+                    <div class="card-title">Key Milestones Schedule</div>
+                    <div class="card-subtitle">Critical path deadlines within the next 14 days</div>
+                  </div>
+                  <a href="tasks.html" class="btn btn-ghost btn-sm font-semibold text-primary">Schedule →</a>
+                </div>
+                <div class="card-body">
+                  <div class="milestones-timeline" id="milestones-timeline-container">
+                    <!-- Populated dynamically -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- Low Stock Critical Materials -->
+              <div class="card">
+                <div class="card-header">
+                  <div>
+                    <div class="card-title" style="color: var(--color-danger);">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                      Material Depletion Alerts
+                    </div>
+                    <div class="card-subtitle">Items below site reorder threshold</div>
+                  </div>
+                  <a href="materials.html" class="btn btn-ghost btn-sm font-semibold text-primary">BOQ Inventory</a>
+                </div>
+                <div class="card-body" style="padding: 0.75rem 1.25rem;">
+                  <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div class="flex items-center justify-between" style="padding-bottom: 0.5rem; border-bottom: 1px solid var(--color-border-subtle);">
+                      <div>
+                        <div class="font-semibold text-dark" style="font-size: 0.88rem;">OPC 53 Cement</div>
+                        <div class="text-muted" style="font-size: 0.75rem;">Skyline Heights • Min: 1,200 Bags</div>
+                      </div>
+                      <div style="text-align: right;">
+                        <span class="badge badge-danger">450 Bags Left</span>
+                        <div><a href="#" class="text-accent font-semibold" style="font-size: 0.75rem;" onclick="window.ui.showToast('Reorder PO created for UltraTech Cement', 'success')">+ Reorder</a></div>
+                      </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <div class="font-semibold text-dark" style="font-size: 0.88rem;">Fe 500D 16mm Rebar</div>
+                        <div class="text-muted" style="font-size: 0.75rem;">Metro Commercial • Min: 25 MT</div>
+                      </div>
+                      <div style="text-align: right;">
+                        <span class="badge badge-warning">8.5 MT Left</span>
+                        <div><a href="#" class="text-accent font-semibold" style="font-size: 0.75rem;" onclick="window.ui.showToast('Reorder PO created for Tata Steel', 'success')">+ Reorder</a></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </section>
+
+        </div>
+      </main>
+
+      <!-- App Footer -->
+      <footer class="app-footer">
+        <div>
+          <strong>BUILDORA</strong> — Enterprise Construction Project Operations Platform &copy; 2026.
+        </div>
+        <div class="flex gap-4">
+          <a href="#" class="text-muted" onclick="window.ui.showToast('Buildora v1.0.4-enterprise (Stable)', 'info')">v1.0.4</a>
+          <a href="#" class="text-muted" onclick="window.ui.showToast('Help center documentation available in next build', 'info')">Help & Support</a>
+          <a href="#" class="text-muted" onclick="window.ui.showToast('System operational. API latency 42ms.', 'success')">System Status: Normal</a>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODALS
+       ========================================================================== -->
+
+  <!-- Modal: Create New Project -->
+  <div id="create-project-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Create New Construction Project</h3>
+        <button class="btn-icon" onclick="window.dashboard.closeModal('create-project-modal')">✕</button>
+      </div>
+      <form id="create-project-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="np-name">Project Title <span class="required-mark">*</span></label>
+            <input type="text" id="np-name" class="form-control" placeholder="e.g. Imperial Heights Phase 2" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="np-client">Client / Developer <span class="required-mark">*</span></label>
+              <input type="text" id="np-client" class="form-control" placeholder="e.g. Oberoi Realty" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="np-location">Site Location <span class="required-mark">*</span></label>
+              <input type="text" id="np-location" class="form-control" placeholder="e.g. Bandra West, Mumbai" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="np-budget">Estimated Budget (in ₹ Crores) <span class="required-mark">*</span></label>
+              <input type="number" step="0.1" id="np-budget" class="form-control" placeholder="15.5" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="np-deadline">Target Completion Date <span class="required-mark">*</span></label>
+              <input type="date" id="np-deadline" class="form-control" required value="2027-12-31">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="window.dashboard.closeModal('create-project-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Initialize Project</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Quick Daily Site Log -->
+  <div id="quick-report-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Submit Daily Site Progress Log</h3>
+        <button class="btn-icon" onclick="window.dashboard.closeModal('quick-report-modal')">✕</button>
+      </div>
+      <form onsubmit="event.preventDefault(); window.ui.showToast('Site report logged and synced to cloud!', 'success'); window.dashboard.closeModal('quick-report-modal');">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Select Site</label>
+            <select class="form-control">
+              <option>Skyline Heights Luxury Towers</option>
+              <option>Metro Commercial Complex</option>
+              <option>Green Valley Residency</option>
+              <option>Riverside Villas & Club</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Workers Present</label>
+              <input type="number" class="form-control" value="142">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Weather Condition</label>
+              <input type="text" class="form-control" value="Clear, 32°C">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Primary Works Executed Today</label>
+            <textarea class="form-control" rows="3" placeholder="Describe casting, rebar fixing, MEP rough-in, or finishing works..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="window.dashboard.closeModal('quick-report-modal')">Discard</button>
+          <button type="submit" class="btn btn-accent">Submit Field Log</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Quick Purchase Request -->
+  <div id="quick-po-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Create Material Purchase Request</h3>
+        <button class="btn-icon" onclick="window.dashboard.closeModal('quick-po-modal')">✕</button>
+      </div>
+      <form onsubmit="event.preventDefault(); window.ui.showToast('Purchase request routed to Finance & PM approval queue.', 'success'); window.dashboard.closeModal('quick-po-modal');">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Project</label>
+            <select class="form-control">
+              <option>Skyline Heights Luxury Towers</option>
+              <option>Metro Commercial Complex</option>
+              <option>Green Valley Residency</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Material Category</label>
+              <select class="form-control">
+                <option>Structural Steel (TMT Rebars)</option>
+                <option>Cement & Aggregates</option>
+                <option>Ready Mix Concrete (RMC)</option>
+                <option>Plumbing & MEP</option>
+                <option>Finishing & Tiles</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Estimated Value (₹)</label>
+              <input type="text" class="form-control" placeholder="e.g. ₹15,00,000">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Urgency Priority</label>
+            <select class="form-control">
+              <option>Normal (7 Days Lead Time)</option>
+              <option>High (3 Days)</option>
+              <option>Critical Path (Immediate)</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="window.dashboard.closeModal('quick-po-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Submit for Approval</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Application Scripts -->
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/components.js"></script>
+  <script src="../js/dashboard.js"></script>
+  <script src="../js/main.js"></script>
+</body>
+</html>
