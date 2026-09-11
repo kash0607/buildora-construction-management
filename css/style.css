@@ -1,0 +1,199 @@
+/* ==========================================================================
+   BUILDORA - GLOBAL DESIGN SYSTEM & TOKENS
+   Inspired by Wix Home Remodeling warm brown earthy aesthetic
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  /* Brand Earthy Brown Palette */
+  --color-primary-brown: #6B4F3A;
+  --color-dark-brown: #463326;
+  --color-secondary-brown: #8A684C;
+  --color-accent: #B88A5A;
+  --color-accent-hover: #A37648;
+  --color-warm-beige: #E9E0D5;
+  --color-warm-sand: #F7F4EF;
+  --color-cream: #FDFBF8;
+  --color-white: #FFFFFF;
+  
+  /* Text Colors */
+  --color-text-dark: #262321;
+  --color-text-body: #4A4642;
+  --color-text-muted: #77716B;
+  --color-text-light: #A39D96;
+  --color-text-on-dark: #FDFBF8;
+
+  /* Border & Dividers */
+  --color-border: #E5DED5;
+  --color-border-subtle: #EFE9E0;
+  --color-border-focus: #B88A5A;
+
+  /* Functional Status Colors */
+  --color-success: #2E7D32;
+  --color-success-bg: #E8F5E9;
+  --color-success-border: #C8E6C9;
+
+  --color-warning: #D97706;
+  --color-warning-bg: #FEF3C7;
+  --color-warning-border: #FDE68A;
+
+  --color-danger: #DC2626;
+  --color-danger-bg: #FEE2E2;
+  --color-danger-border: #FECACA;
+
+  --color-info: #2563EB;
+  --color-info-bg: #EFF6FF;
+  --color-info-border: #BFDBFE;
+
+  /* Typography */
+  --font-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(70, 51, 38, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(70, 51, 38, 0.08), 0 2px 4px -2px rgba(70, 51, 38, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(70, 51, 38, 0.08), 0 4px 6px -4px rgba(70, 51, 38, 0.04);
+  --shadow-xl: 0 20px 25px -5px rgba(70, 51, 38, 0.1), 0 8px 10px -6px rgba(70, 51, 38, 0.05);
+  --shadow-card: 0 2px 8px rgba(70, 51, 38, 0.04), 0 1px 2px rgba(70, 51, 38, 0.06);
+  --shadow-glow: 0 0 15px rgba(184, 138, 90, 0.25);
+
+  /* Radii */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* Layout dimensions */
+  --sidebar-width: 270px;
+  --sidebar-collapsed-width: 80px;
+  --navbar-height: 72px;
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 350ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ==========================================================================
+   CSS RESET & BASE STYLES
+   ========================================================================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 15px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-warm-sand);
+  color: var(--color-text-dark);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  color: var(--color-text-dark);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+h1 { font-size: 1.85rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.25rem; }
+h4 { font-size: 1.05rem; }
+h5 { font-size: 0.95rem; }
+h6 { font-size: 0.85rem; }
+
+p {
+  color: var(--color-text-body);
+  margin-bottom: 0.5rem;
+}
+
+a {
+  color: var(--color-primary-brown);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-accent);
+}
+
+img, svg {
+  display: block;
+  max-width: 100%;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-warm-sand);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-warm-beige);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent);
+}
+
+/* Utilities */
+.text-muted { color: var(--color-text-muted); }
+.text-dark { color: var(--color-text-dark); }
+.text-primary { color: var(--color-primary-brown); }
+.text-accent { color: var(--color-accent); }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+
+.flex { display: flex; }
+.flex-col { display: flex; flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.gap-1 { gap: 0.25rem; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-4 { gap: 1rem; }
+.gap-6 { gap: 1.5rem; }
+
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
