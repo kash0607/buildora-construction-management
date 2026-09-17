@@ -88,7 +88,7 @@
 }
 
 html {
-  font-size: 15px;
+  font-size: 16px;
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -98,9 +98,9 @@ body {
   font-family: var(--font-body);
   background-color: var(--color-warm-sand);
   color: var(--color-text-dark);
-  line-height: 1.6;
+  line-height: 1.65;
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -111,16 +111,18 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.02em;
 }
 
-h1 { font-size: 1.85rem; }
-h2 { font-size: 1.5rem; }
-h3 { font-size: 1.25rem; }
-h4 { font-size: 1.05rem; }
-h5 { font-size: 0.95rem; }
-h6 { font-size: 0.85rem; }
+h1 { font-size: 2.25rem; font-weight: 800; }
+h2 { font-size: 1.75rem; font-weight: 750; }
+h3 { font-size: 1.35rem; font-weight: 700; }
+h4 { font-size: 1.15rem; font-weight: 600; }
+h5 { font-size: 1.02rem; font-weight: 600; }
+h6 { font-size: 0.92rem; font-weight: 600; }
 
 p {
   color: var(--color-text-body);
-  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  line-height: 1.65;
+  margin-bottom: 0.6rem;
 }
 
 a {

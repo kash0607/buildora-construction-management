@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import BuildoraLogo from '../components/common/BuildoraLogo';
 
 export default function Register() {
   const { register } = useAuth();
@@ -63,11 +64,13 @@ export default function Register() {
   };
 
   return (
-    <div className="auth-page">
+    <div className="auth-page auth-page--blue">
       {/* Left Side: Architectural Hero */}
       <div className="auth-hero-side">
         <div className="auth-hero-brand">
-          <div className="brand-icon">B</div>
+          <div className="brand-icon">
+            <BuildoraLogo size={24} color="#ffffff" />
+          </div>
           <div className="brand-text">
             <span
               className="brand-name"
@@ -83,7 +86,6 @@ export default function Register() {
             <span
               className="brand-tagline"
               style={{
-                color: 'var(--color-warm-beige)',
                 fontSize: '0.7rem',
                 letterSpacing: '0.1em'
               }}

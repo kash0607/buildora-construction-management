@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import BuildoraLogo from '../common/BuildoraLogo';
 
 export default function Sidebar({ isOpen, onClose }) {
   const { currentUser, switchRole, logout } = useAuth();
@@ -54,7 +55,9 @@ export default function Sidebar({ isOpen, onClose }) {
       <aside id="app-sidebar" className={`app-sidebar ${isOpen ? 'show-mobile' : ''}`}>
         <div className="sidebar-brand">
           <Link to="/dashboard" className="brand-link" onClick={onClose}>
-            <div className="brand-icon">B</div>
+            <div className="brand-icon">
+              <BuildoraLogo size={22} color="#ffffff" />
+            </div>
             <div className="brand-text">
               <span className="brand-name">BUILDORA</span>
               <span className="brand-tagline">Construction Operations</span>

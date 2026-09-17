@@ -5,6 +5,7 @@ import { ToastProvider } from './context/ToastContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import AppLayout from './components/layout/AppLayout';
 
+import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
@@ -21,27 +22,29 @@ export default function App() {
     <AuthProvider>
       <ToastProvider>
         <Routes>
+          {/* Public SaaS Landing Page */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/landing" element={<LandingPage />} />
+
           {/* Public Auth Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
           {/* Protected Application Workspace */}
           <Route
-            path="/"
             element={
               <ProtectedRoute>
                 <AppLayout />
               </ProtectedRoute>
             }
           >
-            <Route index element={<Navigate to="/dashboard" replace />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="projects" element={<Projects />} />
-            <Route path="projects/:id" element={<ProjectDetails />} />
-            <Route path="tasks" element={<Tasks />} />
-            <Route path="site-reports" element={<SiteReports />} />
-            <Route path="issues" element={<Issues />} />
-            <Route path="approvals" element={<Approvals />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/projects" element={<Projects />} />
+            <Route path="/projects/:id" element={<ProjectDetails />} />
+            <Route path="/tasks" element={<Tasks />} />
+            <Route path="/site-reports" element={<SiteReports />} />
+            <Route path="/issues" element={<Issues />} />
+            <Route path="/approvals" element={<Approvals />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
