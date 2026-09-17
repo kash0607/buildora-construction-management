@@ -105,22 +105,11 @@
    PROJECT CARDS GRID VIEW
    ========================================================================== */
 
-.projects-card-grid {
+.projects-card-grid,
+.projects-cards-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 1.5rem;
-}
-
-@media (max-width: 1200px) {
-  .projects-card-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .projects-card-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 .project-card {
@@ -207,12 +196,17 @@
   border: 1px solid var(--color-border-subtle);
 }
 
-.project-card-stats-row {
+.project-card-stats-row,
+.project-card-stats-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.75rem;
   padding-top: 0.75rem;
   border-top: 1px solid var(--color-border-subtle);
+}
+
+.project-card-stats-grid > div {
+  white-space: nowrap;
 }
 
 .project-card-stat-item {
@@ -233,6 +227,7 @@
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--color-text-dark);
+  white-space: nowrap;
 }
 
 .project-card-footer {

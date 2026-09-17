@@ -60,7 +60,7 @@ export default function Approvals() {
         <div>
           <button className="btn btn-primary" onClick={() => setIsPOOpen(true)}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
-            + New Purchase Request
+            New Purchase Request
           </button>
         </div>
       </div>
@@ -104,13 +104,13 @@ export default function Approvals() {
                     <div className="text-muted" style={{ fontSize: '0.75rem' }}>Vendor: {item.vendor || 'Pending'}</div>
                   </td>
                   <td>{item.project}</td>
-                  <td>
+                  <td style={{ whiteSpace: 'nowrap' }}>
                     <span className="badge badge-neutral">{item.type}</span>
                   </td>
                   <td>{item.requestedBy}</td>
-                  <td className="font-bold text-dark">{item.amount}</td>
-                  <td><StatusBadge status={item.status} /></td>
-                  <td style={{ textAlign: 'right' }}>
+                  <td className="font-bold text-dark" style={{ whiteSpace: 'nowrap' }}>{item.amount}</td>
+                  <td style={{ whiteSpace: 'nowrap' }}><StatusBadge status={item.status} /></td>
+                  <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
                     {item.status === 'Pending' ? (
                       <div className="flex items-center justify-end gap-2">
                         <button

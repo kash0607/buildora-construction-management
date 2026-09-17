@@ -135,7 +135,7 @@ export default function Projects() {
         <div>
           <button className="btn btn-primary" onClick={() => setIsCreateOpen(true)}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            + Create Project
+            Create Project
           </button>
         </div>
       </div>
@@ -261,7 +261,7 @@ export default function Projects() {
                       className="project-card-image"
                       onError={(e) => {
                         e.target.onerror = null;
-                        e.target.src = 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?auto=format&fit=crop&w=800&q=80';
+                        e.target.src = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80';
                       }}
                     />
                     <div className="project-card-status-overlay">

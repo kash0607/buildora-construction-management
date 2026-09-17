@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<<<<<<< HEAD
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -10,9 +11,103 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+=======
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BUILDORA - Materials & Inventory</title>
+  <link rel="stylesheet" href="style.css">
+>>>>>>> origin/main
 </head>
 <body>
-  <div id="root"></div>
-  <script type="module" src="/src/main.jsx"></script>
+  <aside class="sidebar">
+    <h1>BUILDORA</h1>
+    <p class="subtitle">Construction Operations</p>
+    <nav>
+      <a class="active" href="#materials">Materials</a>
+      <a href="#inventory">Inventory</a>
+      <a href="#requests">Material Requests</a>
+      <a href="#movements">Stock Movements</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <header>
+      <div>
+        <h2>Materials & Inventory</h2>
+        <p>Manage construction materials, stock and requests.</p>
+      </div>
+      <button class="primary" onclick="openRequestModal()">+ Material Request</button>
+    </header>
+
+    <section class="stats">
+      <div class="stat"><span>Total Materials</span><strong id="totalMaterials">0</strong></div>
+      <div class="stat"><span>Total Stock</span><strong id="totalStock">0</strong></div>
+      <div class="stat"><span>Low Stock</span><strong id="lowStock">0</strong></div>
+      <div class="stat"><span>Out of Stock</span><strong id="outStock">0</strong></div>
+    </section>
+
+    <section id="materials" class="card">
+      <div class="section-head">
+        <div><h3>Materials</h3><p>Construction material master list</p></div>
+        <input id="search" type="search" placeholder="Search materials..." oninput="render()">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Material</th><th>Category</th><th>Unit</th><th>Unit Cost</th><th>Reorder Level</th><th>Action</th></tr></thead>
+          <tbody id="materialTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="inventory" class="card">
+      <div class="section-head">
+        <div><h3>Inventory</h3><p>Current stock status</p></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Material</th><th>Project</th><th>Available</th><th>Status</th><th>Last Updated</th><th>Movement</th></tr></thead>
+          <tbody id="inventoryTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="requests" class="card">
+      <div class="section-head">
+        <div><h3>Material Requests</h3><p>Requests raised by project/site teams</p></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Request ID</th><th>Material</th><th>Quantity</th><th>Project</th><th>Status</th></tr></thead>
+          <tbody id="requestTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="movements" class="card">
+      <div class="section-head">
+        <div><h3>Stock Movements</h3><p>Recent stock additions and issues</p></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Date</th><th>Material</th><th>Type</th><th>Quantity</th><th>Reference</th></tr></thead>
+          <tbody id="movementTable"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="modal" class="modal">
+    <div class="modal-box">
+      <button class="close" onclick="closeModal()">×</button>
+      <h3>Create Material Request</h3>
+      <form onsubmit="createRequest(event)">
+        <label>Material<select id="reqMaterial" required></select></label>
+        <label>Quantity<input id="reqQty" type="number" min="1" required></label>
+        <label>Project<input id="reqProject" placeholder="e.g. Green Valley Residency" required></label>
+        <button class="primary" type="submit">Create Request</button>
+      </form>
+    </div>
+  </div>
+  <script src="script.js"></script>
 </body>
 </html>

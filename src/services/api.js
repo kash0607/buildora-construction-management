@@ -1,6 +1,6 @@
 import { INITIAL_MOCK_DATA } from './mockData';
 
-const STORAGE_KEY = 'buildora_app_state_v3';
+const STORAGE_KEY = 'buildora_app_state_v4';
 const SIMULATE_DELAY = 60; // smooth latency simulation
 
 class BuildoraAPIService {
@@ -17,7 +17,14 @@ class BuildoraAPIService {
   _getState() {
     try {
       const data = localStorage.getItem(STORAGE_KEY);
-      return data ? JSON.parse(data) : INITIAL_MOCK_DATA;
+      const state = data ? JSON.parse(data) : INITIAL_MOCK_DATA;
+      if (state && Array.isArray(state.tasks)) {
+        state.tasks = state.tasks.map(t => ({
+          ...t,
+          status: t.status === 'Not Started' ? 'To Do' : (t.status || 'To Do')
+        }));
+      }
+      return state;
     } catch {
       return INITIAL_MOCK_DATA;
     }
@@ -159,10 +166,72 @@ class BuildoraAPIService {
   }
 
   // --- Milestones ---
-  async getUpcomingMilestones() {
+  async getMilestones(projectId = null) {
     await this._delay();
     const state = this._getState();
-    return { success: true, data: state.milestones || [] };
+    let milestones = state.milestones || [];
+    if (projectId) {
+      milestones = milestones.filter(m => m.projectId === projectId);
+    }
+    return { success: true, data: milestones };
+  }
+
+  async getUpcomingMilestones(projectId = null) {
+    return this.getMilestones(projectId);
+  }
+
+  async getMilestone(id) {
+    await this._delay();
+    const state = this._getState();
+    const milestone = (state.milestones || []).find(m => m.id === id);
+    if (!milestone) return { success: false, message: 'Milestone not found' };
+    return { success: true, data: milestone };
+  }
+
+  async createMilestone(milestoneData) {
+    await this._delay();
+    const state = this._getState();
+    const newId = 'MLS-' + Math.floor(10 + Math.random() * 90);
+    const newMilestone = {
+      id: newId,
+      projectId: milestoneData.projectId || 'PRJ-101',
+      project: milestoneData.project || 'Skyline Heights',
+      title: milestoneData.title,
+      description: milestoneData.description || '',
+      dueDate: milestoneData.dueDate || new Date().toISOString().split('T')[0],
+      dateFormatted: milestoneData.dueDate || new Date().toISOString().split('T')[0],
+      progress: parseInt(milestoneData.progress, 10) || 0,
+      responsible: milestoneData.responsible || 'Kashish Patel',
+      status: milestoneData.status || 'Upcoming',
+      relatedTaskIds: milestoneData.relatedTaskIds || []
+    };
+
+    if (!state.milestones) state.milestones = [];
+    state.milestones.unshift(newMilestone);
+    this._saveState(state);
+    return { success: true, data: newMilestone, message: 'Milestone created successfully.' };
+  }
+
+  async updateMilestone(id, updatedFields) {
+    await this._delay();
+    const state = this._getState();
+    const index = (state.milestones || []).findIndex(m => m.id === id);
+    if (index === -1) return { success: false, message: 'Milestone not found' };
+
+    state.milestones[index] = {
+      ...state.milestones[index],
+      ...updatedFields
+    };
+    this._saveState(state);
+    return { success: true, data: state.milestones[index], message: 'Milestone updated successfully.' };
+  }
+
+  async archiveMilestone(id) {
+    await this._delay();
+    const state = this._getState();
+    state.milestones = (state.milestones || []).filter(m => m.id !== id);
+    this._saveState(state);
+    return { success: true, message: 'Milestone archived successfully.' };
   }
 
   // --- Approvals ---
@@ -250,31 +319,121 @@ class BuildoraAPIService {
   }
 
   // --- Tasks ---
-  async getTasks(projectId = null) {
+  async getTasks(filterOrProjectId = null) {
     await this._delay();
     const state = this._getState();
-    let tasks = state.tasks || [];
-    if (projectId) {
-      tasks = tasks.filter(t => t.projectId === projectId);
+    let tasks = [...(state.tasks || [])];
+    const today = new Date().toISOString().split('T')[0];
+
+    // Mark isOverdue dynamically
+    tasks = tasks.map(t => ({
+      ...t,
+      isOverdue: !!(t.dueDate && t.dueDate < today && t.status !== 'Completed')
+    }));
+
+    // If string passed (e.g. 'PRJ-101')
+    if (typeof filterOrProjectId === 'string') {
+      tasks = tasks.filter(t => t.projectId === filterOrProjectId && !t.archived);
+      return { success: true, data: tasks };
     }
+
+    const filters = filterOrProjectId || {};
+
+    if (!filters.includeArchived) {
+      tasks = tasks.filter(t => !t.archived);
+    }
+
+    if (filters.projectId && filters.projectId !== 'All') {
+      tasks = tasks.filter(t => t.projectId === filters.projectId);
+    }
+
+    if (filters.status && filters.status !== 'All') {
+      if (filters.status === 'Overdue') {
+        tasks = tasks.filter(t => t.isOverdue);
+      } else if (filters.status === 'To Do') {
+        tasks = tasks.filter(t => t.status === 'To Do' || t.status === 'Not Started');
+      } else {
+        tasks = tasks.filter(t => t.status === filters.status);
+      }
+    }
+
+    if (filters.priority && filters.priority !== 'All') {
+      tasks = tasks.filter(t => t.priority === filters.priority);
+    }
+
+    if (filters.assignee && filters.assignee !== 'All') {
+      tasks = tasks.filter(t => t.assignee === filters.assignee);
+    }
+
+    if (filters.dueDate && filters.dueDate !== 'All') {
+      if (filters.dueDate === 'Overdue') {
+        tasks = tasks.filter(t => t.isOverdue);
+      } else if (filters.dueDate === 'Today') {
+        tasks = tasks.filter(t => t.dueDate === today);
+      } else if (filters.dueDate === 'This Week') {
+        const nextWeek = new Date();
+        nextWeek.setDate(nextWeek.getDate() + 7);
+        const nextWeekStr = nextWeek.toISOString().split('T')[0];
+        tasks = tasks.filter(t => t.dueDate >= today && t.dueDate <= nextWeekStr);
+      }
+    }
+
+    if (filters.search) {
+      const q = filters.search.toLowerCase().trim();
+      tasks = tasks.filter(t =>
+        (t.title && t.title.toLowerCase().includes(q)) ||
+        (t.project && t.project.toLowerCase().includes(q)) ||
+        (t.assignee && t.assignee.toLowerCase().includes(q)) ||
+        (t.description && t.description.toLowerCase().includes(q))
+      );
+    }
+
     return { success: true, data: tasks };
+  }
+
+  async getTask(id) {
+    await this._delay();
+    const state = this._getState();
+    const task = (state.tasks || []).find(t => t.id === id);
+    if (!task) return { success: false, message: 'Task not found' };
+    const today = new Date().toISOString().split('T')[0];
+    return {
+      success: true,
+      data: {
+        ...task,
+        isOverdue: !!(task.dueDate && task.dueDate < today && task.status !== 'Completed')
+      }
+    };
   }
 
   async createTask(taskData) {
     await this._delay();
     const state = this._getState();
+    const today = new Date().toISOString().split('T')[0];
+    const newId = 'TSK-' + Math.floor(100 + Math.random() * 900);
     const newTask = {
-      id: 'TSK-' + Math.floor(100 + Math.random() * 900),
+      id: newId,
       title: taskData.title,
+      description: taskData.description || '',
       projectId: taskData.projectId || 'PRJ-101',
       project: taskData.project || 'Skyline Heights',
       assignee: taskData.assignee || 'Sanjay Verma',
       priority: taskData.priority || 'Medium',
-      status: taskData.status || 'To Do',
-      startDate: taskData.startDate || new Date().toISOString().split('T')[0],
+      status: taskData.status === 'Not Started' ? 'To Do' : (taskData.status || 'To Do'),
+      startDate: taskData.startDate || today,
       dueDate: taskData.dueDate || '2026-09-30',
-      progress: parseInt(taskData.progress, 10) || 0
+      progress: parseInt(taskData.progress, 10) || 0,
+      dependencies: Array.isArray(taskData.dependencies) ? taskData.dependencies : [],
+      createdAt: today,
+      updatedAt: today,
+      archived: false
     };
+
+    if (newTask.status === 'Completed' && newTask.progress < 100) {
+      newTask.progress = 100;
+    } else if (newTask.progress === 100 && newTask.status !== 'Completed') {
+      newTask.status = 'Completed';
+    }
 
     if (!state.tasks) state.tasks = [];
     state.tasks.unshift(newTask);
@@ -282,15 +441,75 @@ class BuildoraAPIService {
     return { success: true, data: newTask, message: 'Task created successfully.' };
   }
 
+  async updateTask(id, updatedFields) {
+    await this._delay();
+    const state = this._getState();
+    const index = (state.tasks || []).findIndex(t => t.id === id);
+    if (index === -1) return { success: false, message: 'Task not found' };
+
+    const today = new Date().toISOString().split('T')[0];
+    const current = state.tasks[index];
+    const updated = {
+      ...current,
+      ...updatedFields,
+      updatedAt: today
+    };
+
+    if (updated.status === 'Completed' && updated.progress < 100) {
+      updated.progress = 100;
+    } else if (updated.progress === 100 && updated.status !== 'Completed') {
+      updated.status = 'Completed';
+    }
+
+    state.tasks[index] = updated;
+    this._saveState(state);
+    return { success: true, data: updated, message: 'Task updated successfully.' };
+  }
+
   async updateTaskStatus(taskId, newStatus) {
     await this._delay();
     const state = this._getState();
     const task = (state.tasks || []).find(t => t.id === taskId);
     if (!task) return { success: false, message: 'Task not found' };
-    task.status = newStatus;
-    if (newStatus === 'Completed') task.progress = 100;
+    task.status = newStatus === 'Not Started' ? 'To Do' : newStatus;
+    if (task.status === 'Completed') task.progress = 100;
+    task.updatedAt = new Date().toISOString().split('T')[0];
     this._saveState(state);
-    return { success: true, data: task, message: 'Task status updated.' };
+    return { success: true, data: task, message: `Task moved to ${newStatus}.` };
+  }
+
+  async archiveTask(id) {
+    await this._delay();
+    const state = this._getState();
+    const task = (state.tasks || []).find(t => t.id === id);
+    if (!task) return { success: false, message: 'Task not found' };
+    task.archived = true;
+    task.updatedAt = new Date().toISOString().split('T')[0];
+    this._saveState(state);
+    return { success: true, data: task, message: 'Task archived successfully.' };
+  }
+
+  async getTaskSummaryStats(projectId = null) {
+    await this._delay();
+    const state = this._getState();
+    let tasks = (state.tasks || []).filter(t => !t.archived);
+    if (projectId) {
+      tasks = tasks.filter(t => t.projectId === projectId);
+    }
+    const today = new Date().toISOString().split('T')[0];
+
+    const total = tasks.length;
+    const toDo = tasks.filter(t => t.status === 'To Do' || t.status === 'Not Started').length;
+    const inProgress = tasks.filter(t => t.status === 'In Progress').length;
+    const review = tasks.filter(t => t.status === 'Review').length;
+    const completed = tasks.filter(t => t.status === 'Completed').length;
+    const overdue = tasks.filter(t => t.dueDate && t.dueDate < today && t.status !== 'Completed').length;
+    const blocked = tasks.filter(t => t.status === 'Blocked').length;
+
+    return {
+      success: true,
+      data: { total, toDo, inProgress, review, completed, overdue, blocked }
+    };
   }
 
   // --- Issues ---

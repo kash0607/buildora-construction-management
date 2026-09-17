@@ -12,6 +12,7 @@ export default function ProjectDetails() {
 
   const [project, setProject] = useState(null);
   const [tasks, setTasks] = useState([]);
+  const [milestones, setMilestones] = useState([]);
   const [issues, setIssues] = useState([]);
   const [siteReports, setSiteReports] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,11 +21,12 @@ export default function ProjectDetails() {
 
   const loadProjectData = async () => {
     try {
-      const [pRes, tRes, iRes, rRes] = await Promise.all([
+      const [pRes, tRes, iRes, rRes, mRes] = await Promise.all([
         api.getProject(projectId),
         api.getTasks(projectId),
         api.getIssues(projectId),
-        api.getRecentSiteReports()
+        api.getRecentSiteReports(),
+        api.getMilestones(projectId)
       ]);
 
       if (pRes.success) {
@@ -34,6 +36,7 @@ export default function ProjectDetails() {
       }
 
       if (tRes.success) setTasks(tRes.data);
+      if (mRes.success) setMilestones(mRes.data);
       if (iRes.success) setIssues(iRes.data);
       if (rRes.success) {
         setSiteReports(rRes.data.filter((r) => r.project.includes(pRes?.data?.name || '')));
@@ -338,8 +341,8 @@ export default function ProjectDetails() {
               <div className="card-title">Project Tasks & Deliverables</div>
               <div className="card-subtitle">Work execution assigned for {project.name}</div>
             </div>
-            <Link to="/tasks" className="btn btn-primary btn-sm">
-              Open Full Tasks Module →
+            <Link to={`/tasks?project=${project.id}`} className="btn btn-primary btn-sm">
+              View in Tasks & Milestones Module →
             </Link>
           </div>
           <div className="card-body">
@@ -347,6 +350,9 @@ export default function ProjectDetails() {
               <div className="empty-state">
                 <div className="empty-state-title">No Specific Tasks Found</div>
                 <div className="empty-state-desc">Create tasks to track sub-contractor activities and structural progress.</div>
+                <Link to={`/tasks?project=${project.id}`} className="btn btn-primary btn-sm" style={{ marginTop: '0.75rem' }}>
+                  + Create Task in Module
+                </Link>
               </div>
             ) : (
               <div className="table-wrapper" style={{ border: 'none' }}>
@@ -384,32 +390,52 @@ export default function ProjectDetails() {
       {activeTab === 'milestones' && (
         <div className="card">
           <div className="card-header">
-            <div className="card-title">Key Baseline Milestones</div>
-            <Link to="/tasks" className="btn btn-outline btn-sm">View Schedule</Link>
+            <div>
+              <div className="card-title">Key Baseline Milestones</div>
+              <div className="card-subtitle">Critical path gates and engineering deliverables for {project.name}</div>
+            </div>
+            <Link to={`/tasks?project=${project.id}`} className="btn btn-primary btn-sm">
+              Manage in Tasks & Milestones →
+            </Link>
           </div>
           <div className="card-body">
-            <div className="milestones-timeline">
-              <div className="milestone-timeline-item">
-                <div className="milestone-bullet completed" />
-                <div className="milestone-timeline-content">
-                  <div className="flex items-center justify-between">
-                    <div className="milestone-timeline-title">Foundation & Substructure Handover</div>
-                    <span className="badge badge-success">Completed</span>
-                  </div>
-                  <div className="milestone-timeline-meta">Signed off by Lead Structural Consultant</div>
-                </div>
+            {milestones.length === 0 ? (
+              <div className="empty-state">
+                <div className="empty-state-title">No Milestones Recorded</div>
+                <div className="empty-state-desc">Establish baseline engineering gates and completion targets for this site.</div>
+                <Link to={`/tasks?project=${project.id}`} className="btn btn-primary btn-sm" style={{ marginTop: '0.75rem' }}>
+                  + Add Milestone
+                </Link>
               </div>
-              <div className="milestone-timeline-item">
-                <div className="milestone-bullet active" />
-                <div className="milestone-timeline-content">
-                  <div className="flex items-center justify-between">
-                    <div className="milestone-timeline-title">Superstructure 18th Floor Slab Casting</div>
-                    <span className="badge badge-warning">In Progress (92%)</span>
+            ) : (
+              <div className="milestones-timeline">
+                {milestones.map((m) => (
+                  <div key={m.id} className="milestone-timeline-item">
+                    <div className={`milestone-bullet ${m.status === 'Completed' ? 'completed' : 'active'}`} />
+                    <div className="milestone-timeline-content">
+                      <div className="flex items-center justify-between">
+                        <div className="milestone-timeline-title font-bold text-dark">{m.title}</div>
+                        <StatusBadge status={m.status} />
+                      </div>
+                      {m.description && (
+                        <p style={{ fontSize: '0.82rem', color: 'var(--color-text-body)', margin: '0.25rem 0' }}>
+                          {m.description}
+                        </p>
+                      )}
+                      <div className="milestone-timeline-meta" style={{ fontSize: '0.76rem', color: 'var(--color-text-muted)', marginTop: '0.2rem' }}>
+                        📅 Target: <strong>{m.dueDate}</strong> • 👤 Lead: {m.responsible}
+                      </div>
+                      <div className="progress-bar-wrap" style={{ height: '5px', marginTop: '0.45rem' }}>
+                        <div
+                          className="progress-bar-fill primary"
+                          style={{ width: `${m.progress}%`, backgroundColor: m.progress === 100 ? 'var(--color-success)' : undefined }}
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <div className="milestone-timeline-meta">Target: Tomorrow • Sanjay Verma (Site Sup.)</div>
-                </div>
+                ))}
               </div>
-            </div>
+            )}
           </div>
         </div>
       )}

@@ -395,8 +395,8 @@ export default function Dashboard() {
                             <span className="font-semibold" style={{ fontSize: '0.78rem' }}>{p.progress}%</span>
                           </div>
                         </td>
-                        <td className="font-semibold">{budgetCr}</td>
-                        <td>
+                        <td className="font-semibold" style={{ whiteSpace: 'nowrap' }}>{budgetCr}</td>
+                        <td style={{ whiteSpace: 'nowrap' }}>
                           <StatusBadge status={p.status} />
                         </td>
                         <td style={{ textAlign: 'right' }}>

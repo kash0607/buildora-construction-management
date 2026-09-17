@@ -81,7 +81,7 @@ export default function Issues() {
         <div>
           <button className="btn btn-primary" onClick={() => setIsCreateOpen(true)}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            + Report Site Issue
+            Report Site Issue
           </button>
         </div>
       </div>
@@ -128,11 +128,11 @@ export default function Issues() {
                     <div className="text-muted" style={{ fontSize: '0.75rem' }}>{iss.description}</div>
                   </td>
                   <td>{iss.project}</td>
-                  <td><StatusBadge status={iss.priority} /></td>
+                  <td style={{ whiteSpace: 'nowrap' }}><StatusBadge status={iss.priority} /></td>
                   <td>{iss.assignee}</td>
-                  <td className="text-muted" style={{ fontSize: '0.8rem' }}>{iss.date}</td>
-                  <td><StatusBadge status={iss.status} /></td>
-                  <td style={{ textAlign: 'right' }}>
+                  <td className="text-muted" style={{ fontSize: '0.8rem', whiteSpace: 'nowrap' }}>{iss.date}</td>
+                  <td style={{ whiteSpace: 'nowrap' }}><StatusBadge status={iss.status} /></td>
+                  <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
                     <button
                       type="button"
                       className="btn btn-ghost btn-sm text-primary font-semibold"
