@@ -5,6 +5,7 @@ import { ToastProvider } from './context/ToastContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import AppLayout from './components/layout/AppLayout';
 
+import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
@@ -23,13 +24,16 @@ export default function App() {
     <AuthProvider>
       <ToastProvider>
         <Routes>
+          {/* Public SaaS Landing Page */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/landing" element={<LandingPage />} />
+
           {/* Public Auth Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
           {/* Protected Application Workspace */}
           <Route
-            path="/"
             element={
               <ProtectedRoute>
                 <AppLayout />
@@ -46,8 +50,10 @@ export default function App() {
             <Route path="approvals" element={<Approvals />} />
             <Route path="materials" element={<Materials />} />
             <Route path="inventory" element={<Inventory />} />
-            <Route path="*" element={<NotFound />} />
           </Route>
+
+          {/* 404 */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </ToastProvider>
     </AuthProvider>

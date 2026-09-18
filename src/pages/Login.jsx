@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import BuildoraLogo from '../components/common/BuildoraLogo';
 
 export default function Login() {
   const { login } = useAuth();
@@ -75,11 +76,13 @@ export default function Login() {
   };
 
   return (
-    <div className="auth-page">
+    <div className="auth-page auth-page--blue">
       {/* Left Side: Architectural Construction Hero */}
       <div className="auth-hero-side">
         <div className="auth-hero-brand">
-          <div className="brand-icon">B</div>
+          <div className="brand-icon">
+            <BuildoraLogo size={24} color="#ffffff" />
+          </div>
           <div className="brand-text">
             <span
               className="brand-name"
@@ -95,7 +98,6 @@ export default function Login() {
             <span
               className="brand-tagline"
               style={{
-                color: 'var(--color-warm-beige)',
                 fontSize: '0.7rem',
                 letterSpacing: '0.1em'
               }}
@@ -174,8 +176,8 @@ export default function Login() {
                 Password <span className="required-mark">*</span>
                 <a
                   href="#forgot"
-                  className="text-accent"
-                  style={{ fontSize: '0.78rem', fontWeight: 500 }}
+                  className="text-primary"
+                  style={{ fontSize: '0.82rem', fontWeight: 500 }}
                   onClick={(e) => {
                     e.preventDefault();
                     showToast('Demo password reset link sent to registered email', 'info');

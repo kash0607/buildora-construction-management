@@ -1,0 +1,412 @@
+/* ==========================================================================
+   IMAGE STACK COMPONENT STYLES (Buildora Modern Card Deck)
+   ========================================================================== */
+
+.lp-image-stack-container {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  height: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1200px;
+  user-select: none;
+  margin: 0 auto;
+}
+
+/* Ambient Backdrop Glow & Blueprint frame */
+.lp-image-stack-backdrop {
+  position: absolute;
+  inset: -16px;
+  background: radial-gradient(130% 100% at 50% 20%, rgba(37, 99, 235, 0.08) 0%, rgba(224, 169, 109, 0.06) 50%, rgba(241, 245, 249, 0.4) 100%);
+  border-radius: 32px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  pointer-events: none;
+  z-index: 0;
+  transition: all 0.4s ease;
+}
+
+.lp-image-stack-container:hover .lp-image-stack-backdrop {
+  background: radial-gradient(130% 100% at 50% 20%, rgba(37, 99, 235, 0.12) 0%, rgba(224, 169, 109, 0.09) 50%, rgba(241, 245, 249, 0.6) 100%);
+  border-color: rgba(37, 99, 235, 0.2);
+}
+
+/* Cards Wrapper */
+.lp-image-stack-deck {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-height: 440px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+/* Individual Card in Stack */
+.lp-stack-card {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 16px 40px -10px rgba(15, 29, 46, 0.22), 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  background: #0F1D2E;
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1),
+              opacity 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+              filter 0.5s ease,
+              box-shadow 0.5s ease;
+  will-change: transform, opacity;
+}
+
+.lp-stack-card-img-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.lp-stack-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform: scale(1);
+  transition: transform 0.7s cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.lp-stack-card.active:hover .lp-stack-card-img {
+  transform: scale(1.04);
+}
+
+/* Vignette & Gradients */
+.lp-stack-card-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(15, 29, 46, 0.2) 0%, rgba(15, 29, 46, 0.1) 40%, rgba(15, 29, 46, 0.92) 85%, #0F1D2E 100%);
+  pointer-events: none;
+}
+
+/* Top Floating Tag */
+.lp-stack-card-top-tag {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(15, 29, 46, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 6px 14px;
+  border-radius: 30px;
+  color: #FFFFFF;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  z-index: 2;
+}
+
+.lp-stack-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #22C55E;
+  box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+  animation: lpPulse 2s infinite;
+}
+
+@keyframes lpPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+  }
+}
+
+.lp-stack-card-counter {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: rgba(15, 29, 46, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 5px 12px;
+  border-radius: 20px;
+  color: #E0A96D;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  font-family: var(--lp-font-mono, monospace);
+  z-index: 2;
+}
+
+/* Bottom Information Sheet / Badge */
+.lp-stack-card-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px 22px 22px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lp-stack-card-main-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.lp-stack-badge-icon-box {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+}
+
+.lp-stack-badge-text-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.lp-stack-card-title {
+  color: #FFFFFF;
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0;
+  font-family: var(--lp-font-heading, inherit);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lp-stack-card-desc {
+  color: #CBD5E1;
+  font-size: 0.83rem;
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Metric / Stat pill on active card */
+.lp-stack-metric-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.lp-stack-metric-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #F8FAFC;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.lp-stack-metric-highlight {
+  color: #E0A96D;
+  font-weight: 700;
+}
+
+.lp-stack-location-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #94A3B8;
+  font-size: 0.75rem;
+}
+
+/* Stack Controls Toolbar */
+.lp-stack-controls {
+  position: absolute;
+  bottom: -48px;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  z-index: 10;
+}
+
+.lp-stack-dots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lp-stack-dot-btn {
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background: #CBD5E1;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lp-stack-dot-btn:hover {
+  background: #94A3B8;
+  transform: scale(1.2);
+}
+
+.lp-stack-dot-btn.active {
+  width: 28px;
+  background: #2563EB;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+}
+
+.lp-stack-arrows {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lp-deck-arrow-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  color: #0F172A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.22s ease;
+  padding: 0;
+}
+
+.lp-deck-arrow-btn:hover {
+  background: #0F1D2E;
+  color: #FFFFFF;
+  border-color: #0F1D2E;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(15, 29, 46, 0.22);
+}
+
+.lp-deck-arrow-btn:active {
+  transform: translateY(0);
+}
+
+.lp-deck-arrow-btn svg {
+  display: block;
+  flex-shrink: 0;
+  stroke: currentColor;
+}
+
+.lp-stack-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  color: #64748B;
+  font-weight: 500;
+}
+
+/* Stack 3D Positioning Classes */
+/* Active Front Card */
+.lp-stack-card.pos-0 {
+  transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  z-index: 4;
+  opacity: 1;
+  filter: blur(0px) brightness(1);
+  box-shadow: 0 20px 45px -10px rgba(15, 29, 46, 0.3), 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Middle Card (Shifted right & angled) */
+.lp-stack-card.pos-1 {
+  transform: translate3d(24px, -14px, -40px) rotate(3.5deg) scale(0.95);
+  z-index: 3;
+  opacity: 0.85;
+  filter: blur(0.5px) brightness(0.88);
+}
+
+.lp-image-stack-container:hover .lp-stack-card.pos-1 {
+  transform: translate3d(36px, -20px, -40px) rotate(5deg) scale(0.96);
+  opacity: 0.92;
+}
+
+/* Back Card (Shifted left & angled) */
+.lp-stack-card.pos-2 {
+  transform: translate3d(-20px, -26px, -80px) rotate(-3.5deg) scale(0.9);
+  z-index: 2;
+  opacity: 0.68;
+  filter: blur(1.2px) brightness(0.78);
+}
+
+.lp-image-stack-container:hover .lp-stack-card.pos-2 {
+  transform: translate3d(-32px, -36px, -80px) rotate(-5.5deg) scale(0.92);
+  opacity: 0.8;
+}
+
+/* Deepest Back Card (Shifted up center) */
+.lp-stack-card.pos-3 {
+  transform: translate3d(0px, -38px, -120px) rotate(1deg) scale(0.86);
+  z-index: 1;
+  opacity: 0.45;
+  filter: blur(2px) brightness(0.7);
+}
+
+.lp-image-stack-container:hover .lp-stack-card.pos-3 {
+  transform: translate3d(0px, -50px, -120px) rotate(1.5deg) scale(0.88);
+  opacity: 0.6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991px) {
+  .lp-image-stack-container {
+    max-width: 480px;
+    height: 440px;
+    margin-bottom: 50px;
+  }
+}
+
+@media (max-width: 640px) {
+  .lp-image-stack-container {
+    max-width: 100%;
+    height: 400px;
+    margin-bottom: 55px;
+  }
+  .lp-stack-card.pos-1 {
+    transform: translate3d(12px, -8px, -40px) rotate(2deg) scale(0.96);
+  }
+  .lp-stack-card.pos-2 {
+    transform: translate3d(-10px, -16px, -80px) rotate(-2deg) scale(0.92);
+  }
+  .lp-stack-card.pos-3 {
+    display: none;
+  }
+  .lp-stack-card-title {
+    font-size: 0.94rem;
+  }
+  .lp-stack-card-desc {
+    font-size: 0.78rem;
+  }
+}

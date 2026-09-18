@@ -11,7 +11,7 @@
 }
 
 .form-label {
-  font-size: 0.85rem;
+  font-size: 0.94rem;
   font-weight: 600;
   color: var(--color-text-dark);
   display: flex;
@@ -26,12 +26,12 @@
 
 .form-control {
   width: 100%;
-  padding: 0.7rem 1rem;
+  padding: 0.8rem 1.1rem;
   background-color: var(--color-white);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   color: var(--color-text-dark);
-  font-size: 0.9rem;
+  font-size: 1rem;
   transition: all var(--transition-fast);
   outline: none;
 }
@@ -56,16 +56,16 @@
 }
 
 .form-hint {
-  font-size: 0.75rem;
+  font-size: 0.82rem;
   color: var(--color-text-muted);
 }
 
 .invalid-feedback {
-  font-size: 0.78rem;
+  font-size: 0.85rem;
   color: var(--color-danger);
   font-weight: 500;
   display: none;
-  margin-top: 0.2rem;
+  margin-top: 0.25rem;
 }
 
 .is-invalid ~ .invalid-feedback {
@@ -360,3 +360,170 @@ input[type="radio"]:checked + .radio-custom::after {
   border-color: var(--color-accent);
   color: var(--color-dark-brown);
 }
+
+/* ==========================================================================
+   SOFT BLUE TEXTURE AUTH THEME (FOR REGISTER PAGE)
+   ========================================================================== */
+
+.auth-page--blue {
+  background-color: #f0f6fc;
+}
+
+/* Left Hero: Soft Blue Overlay with high image visibility and clarity */
+.auth-page--blue .auth-hero-side {
+  background: 
+    radial-gradient(circle at 15% 20%, rgba(56, 189, 248, 0.20) 0%, transparent 45%),
+    radial-gradient(circle at 85% 75%, rgba(37, 99, 235, 0.22) 0%, transparent 50%),
+    linear-gradient(135deg, rgba(13, 27, 49, 0.45) 0%, rgba(20, 50, 92, 0.30) 50%, rgba(10, 25, 47, 0.50) 100%),
+    url('/register-bg.png') center/cover no-repeat;
+  color: #ffffff;
+}
+
+.auth-page--blue .auth-hero-brand .brand-icon {
+  background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(56, 189, 248, 0.35);
+}
+
+.auth-page--blue .auth-hero-brand .brand-tagline {
+  color: #bae6fd !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.auth-page--blue .auth-hero-badge {
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(147, 197, 253, 0.45);
+  color: #bae6fd;
+}
+
+.auth-page--blue .auth-hero-title {
+  color: #ffffff;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.55);
+}
+
+.auth-page--blue .auth-hero-desc {
+  color: #f0f9ff;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+}
+
+.auth-page--blue .auth-hero-stats {
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.auth-page--blue .hero-stat-num {
+  color: #38bdf8;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+}
+
+.auth-page--blue .hero-stat-label {
+  color: #e0f2fe;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.auth-page--blue .auth-hero-footer {
+  color: rgba(240, 249, 255, 0.85);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Right Side: Light & Soft Blue Canvas */
+.auth-page--blue .auth-form-side {
+  background-color: #f6f9fd;
+  background-image:
+    radial-gradient(circle at 10% 10%, rgba(191, 219, 254, 0.35) 0%, transparent 40%),
+    radial-gradient(circle at 90% 90%, rgba(186, 230, 253, 0.30) 0%, transparent 45%),
+    radial-gradient(circle at 50% 40%, rgba(224, 242, 254, 0.25) 0%, transparent 55%),
+    radial-gradient(#93c5fd 0.6px, transparent 0.6px);
+  background-size: auto, auto, auto, 24px 24px;
+}
+
+/* Auth Card with Soft Blue Frosting & Elevation */
+.auth-page--blue .auth-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  border: 1px solid #dbeafe;
+  box-shadow: 
+    0 4px 6px -1px rgba(30, 58, 138, 0.04),
+    0 20px 35px -10px rgba(30, 58, 138, 0.08),
+    0 0 0 1px rgba(224, 242, 254, 0.8);
+  border-radius: var(--radius-xl);
+}
+
+.auth-page--blue .auth-card-title {
+  color: #0f2744;
+  letter-spacing: -0.02em;
+}
+
+.auth-page--blue .auth-card-subtitle {
+  color: #64748b;
+}
+
+.auth-page--blue .form-label {
+  color: #1e293b;
+}
+
+.auth-page--blue .form-control {
+  border: 1.5px solid #cbd5e1;
+  background-color: #ffffff;
+  color: #0f172a;
+  border-radius: var(--radius-md);
+}
+
+.auth-page--blue .form-control:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3.5px rgba(59, 130, 246, 0.18);
+  background-color: #ffffff;
+}
+
+.auth-page--blue .form-control::placeholder {
+  color: #94a3b8;
+}
+
+.auth-page--blue input[type="checkbox"]:checked + .checkbox-custom {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+.auth-page--blue .btn-primary {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+  transition: all var(--transition-normal);
+}
+
+.auth-page--blue .btn-primary:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
+  transform: translateY(-1px);
+}
+
+.auth-page--blue .text-primary {
+  color: #2563eb !important;
+}
+
+.auth-page--blue .text-primary:hover {
+  color: #1d4ed8 !important;
+  text-decoration: underline;
+}
+
+.auth-page--blue .demo-accounts-box {
+  border-top: 1px solid #e2e8f0;
+}
+
+.auth-page--blue .demo-accounts-header {
+  color: #64748b;
+}
+
+.auth-page--blue .demo-pill-btn {
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
+}
+
+.auth-page--blue .demo-pill-btn:hover {
+  background-color: #dbeafe;
+  border-color: #3b82f6;
+  color: #1d4ed8;
+}
+

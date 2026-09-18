@@ -110,6 +110,7 @@
 
   .welcome-actions {
     width: 100%;
+    flex-direction: column;
   }
 
   .welcome-actions .btn {
@@ -133,6 +134,7 @@
   .table-custom th,
   .table-custom td {
     padding: 0.65rem 0.85rem;
+    font-size: 0.82rem;
   }
 
   .approval-item {
@@ -145,6 +147,59 @@
     width: 100%;
     justify-content: flex-end;
   }
+
+  .projects-controls-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .projects-search-filter-group {
+    min-width: 100%;
+    flex-direction: column;
+  }
+
+  .projects-search-filter-group input,
+  .projects-search-filter-group select {
+    width: 100%;
+  }
+
+  .view-switcher-group {
+    align-self: flex-start;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .page-header-actions {
+    width: 100%;
+  }
+
+  .page-header-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Global Responsive Helpers */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 1rem;
+}
+
+.tabs-nav-scroll {
+  display: flex;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.tabs-nav-scroll::-webkit-scrollbar {
+  display: none;
 }
 
 /* Sidebar Backdrop on Mobile */

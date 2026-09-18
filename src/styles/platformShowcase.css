@@ -1,0 +1,837 @@
+/* ==========================================================================
+   LIVE PLATFORM SHOWCASE (Professional Enterprise SaaS Architecture)
+   ========================================================================== */
+
+.lp-showcase-section {
+  padding: 100px 0;
+  background-color: #F8FAFC;
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid #E2E8F0;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.lp-showcase-container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 32px;
+  position: relative;
+  z-index: 2;
+}
+
+/* 3-Column Grid Layout: Text | Expanded Big Laptop | Synced Feature Cards */
+.lp-showcase-grid {
+  display: grid;
+  grid-template-columns: 320px minmax(580px, 1.4fr) 350px;
+  gap: 36px;
+  align-items: center;
+}
+
+/* --------------------------------------------------------------------------
+   LEFT COLUMN: Header, Eyebrow & Actions
+   -------------------------------------------------------------------------- */
+.lp-showcase-left {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.lp-showcase-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1D4ED8;
+  padding: 6px 14px;
+  border-radius: 30px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-family: var(--lp-font-heading, inherit);
+  width: fit-content;
+}
+
+.lp-showcase-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2563EB;
+  box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.6);
+  animation: showcasePulse 2s infinite;
+}
+
+@keyframes showcasePulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 9px rgba(37, 99, 235, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+  }
+}
+
+.lp-showcase-title {
+  font-size: 2.35rem;
+  font-weight: 800;
+  line-height: 1.2;
+  color: #0F1D2E;
+  font-family: var(--lp-font-heading, inherit);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.lp-showcase-desc {
+  font-size: 0.98rem;
+  line-height: 1.65;
+  color: #475569;
+  font-family: var(--lp-font-body, inherit);
+  margin: 0;
+}
+
+/* Quick Metrics Row */
+.lp-showcase-stats-row {
+  display: flex;
+  gap: 20px;
+  padding: 16px 0;
+  border-top: 1px solid #E2E8F0;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.lp-showcase-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lp-showcase-stat-val {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #0F1D2E;
+  font-family: var(--lp-font-heading, inherit);
+}
+
+.lp-showcase-stat-lbl {
+  font-size: 0.78rem;
+  color: #64748B;
+  font-weight: 500;
+  font-family: var(--lp-font-body, inherit);
+}
+
+/* Dual CTA Buttons */
+.lp-showcase-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.lp-btn-primary-showcase {
+  background: #0F1D2E;
+  color: #FFFFFF;
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  font-family: var(--lp-font-body, inherit);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  border: 1px solid #0F1D2E;
+  box-shadow: 0 4px 14px rgba(15, 29, 46, 0.2);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lp-btn-primary-showcase:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(15, 29, 46, 0.3);
+  background: #2563EB;
+  border-color: #2563EB;
+}
+
+.lp-btn-secondary-showcase {
+  background: #FFFFFF;
+  color: #1E293B;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  font-family: var(--lp-font-body, inherit);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1.5px solid #CBD5E1;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+.lp-btn-secondary-showcase:hover {
+  border-color: #2563EB;
+  color: #2563EB;
+  background: #F8FAFC;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.12);
+}
+
+/* --------------------------------------------------------------------------
+   CENTER COLUMN: Large, Clear & Ultra-Readable Laptop Mockup
+   -------------------------------------------------------------------------- */
+.lp-showcase-mockup-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Laptop Physical Structure (Expanded Size) */
+.lp-laptop-chassis {
+  position: relative;
+  width: 100%;
+  max-width: 740px;
+  box-shadow: 0 24px 65px -12px rgba(15, 29, 46, 0.28), 0 8px 24px rgba(0, 0, 0, 0.08);
+  border-radius: 16px 16px 8px 8px;
+}
+
+/* Screen Bezel */
+.lp-laptop-bezel {
+  background: #0F172A;
+  border-radius: 16px 16px 0 0;
+  padding: 12px 12px 0 12px;
+  border: 2.5px solid #334155;
+  border-bottom: none;
+  position: relative;
+}
+
+/* Webcam Bar */
+.lp-laptop-camera-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.lp-laptop-lens {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #1E293B;
+  box-shadow: inset 0 0 2px #000;
+}
+
+.lp-laptop-cam-led {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #22C55E;
+  box-shadow: 0 0 5px #22C55E;
+}
+
+/* Screen Display Area (Expanded Height & Legibility) */
+.lp-laptop-screen-display {
+  background: #0B132B;
+  border-radius: 8px 8px 0 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  min-height: 410px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  font-family: var(--lp-font-body, inherit);
+}
+
+/* Laptop Base & Hinge */
+.lp-laptop-hinge-base {
+  background: linear-gradient(180deg, #94A3B8 0%, #64748B 40%, #475569 100%);
+  height: 16px;
+  border-radius: 0 0 18px 18px;
+  position: relative;
+  box-shadow: 0 8px 24px rgba(15, 29, 46, 0.3);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.lp-laptop-center-notch {
+  width: 76px;
+  height: 6px;
+  background: #334155;
+  border-radius: 0 0 6px 6px;
+}
+
+/* --------------------------------------------------------------------------
+   INSIDE LAPTOP DASHBOARD UI (Ultra-Readable Enterprise Sizing)
+   -------------------------------------------------------------------------- */
+.lp-dash-topbar {
+  background: #090E17;
+  padding: 11px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.lp-dash-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 0.04em;
+  font-family: var(--lp-font-heading, inherit);
+}
+
+.lp-dash-tabs {
+  display: flex;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 3px;
+  border-radius: 7px;
+}
+
+.lp-dash-tab-btn {
+  background: transparent;
+  border: none;
+  color: #94A3B8;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: var(--lp-font-body, inherit);
+  padding: 5px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lp-dash-tab-btn:hover {
+  color: #FFFFFF;
+}
+
+.lp-dash-tab-btn.active {
+  background: #2563EB;
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.45);
+}
+
+.lp-dash-body {
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+}
+
+/* KPI Triplet Row */
+.lp-dash-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.lp-dash-kpi {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.lp-dash-kpi-title {
+  font-size: 0.78rem;
+  color: #94A3B8;
+  font-weight: 500;
+  font-family: var(--lp-font-body, inherit);
+}
+
+.lp-dash-kpi-val {
+  font-size: 1.28rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  font-family: var(--lp-font-heading, inherit);
+}
+
+.lp-dash-kpi-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: var(--lp-font-body, inherit);
+}
+
+.lp-dash-kpi-badge.green {
+  color: #4ADE80;
+}
+
+.lp-dash-kpi-badge.gold {
+  color: #FBBF24;
+}
+
+.lp-dash-kpi-badge.blue {
+  color: #60A5FA;
+}
+
+/* Dynamic Viewport (Large & Readable) */
+.lp-dash-viewport {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 14px 16px;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  animation: fadeInContent 0.3s ease;
+}
+
+@keyframes fadeInContent {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.lp-dash-view-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.86rem;
+  color: #94A3B8;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+.lp-dash-view-title {
+  font-weight: 600;
+  color: #F1F5F9;
+  font-family: var(--lp-font-heading, inherit);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lp-dash-live-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: #4ADE80;
+  font-weight: 600;
+}
+
+/* View 1: Manpower Bar Chart */
+.lp-bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  height: 125px;
+  padding: 6px 0;
+}
+
+.lp-bar-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.lp-bar-val-tip {
+  font-size: 0.68rem;
+  color: #94A3B8;
+  font-weight: 600;
+}
+
+.lp-bar-stick {
+  width: 100%;
+  border-radius: 4px 4px 0 0;
+  background: rgba(37, 99, 235, 0.4);
+  transition: all 0.4s ease;
+}
+
+.lp-bar-stick.active {
+  background: linear-gradient(180deg, #60A5FA 0%, #2563EB 100%);
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.5);
+}
+
+.lp-bar-label {
+  font-size: 0.76rem;
+  color: #94A3B8;
+  font-weight: 600;
+}
+
+/* View 2: Inventory Ledger Bars */
+.lp-stock-list {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.lp-stock-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lp-stock-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.84rem;
+  color: #E2E8F0;
+}
+
+.lp-stock-name {
+  font-weight: 500;
+}
+
+.lp-stock-quant {
+  font-weight: 600;
+}
+
+.lp-stock-track {
+  height: 8px;
+  background: #1E293B;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.lp-stock-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.6s ease;
+}
+
+/* View 3: 3-Way Match Card */
+.lp-match-flow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.lp-match-step {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 7px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.lp-match-step-title {
+  font-size: 0.74rem;
+  color: #94A3B8;
+}
+
+.lp-match-step-val {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.lp-match-step-status {
+  font-size: 0.75rem;
+  color: #4ADE80;
+  font-weight: 600;
+}
+
+.lp-match-arrow {
+  color: #64748B;
+  font-size: 0.95rem;
+}
+
+.lp-match-badge-result {
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 7px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: #4ADE80;
+}
+
+/* View 4: Site Snags List */
+.lp-snag-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lp-snag-item {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 7px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lp-snag-title {
+  font-size: 0.85rem;
+  color: #F1F5F9;
+  display: block;
+}
+
+.lp-snag-meta {
+  font-size: 0.74rem;
+  color: #94A3B8;
+  margin-top: 2px;
+}
+
+.lp-snag-pill {
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-weight: 700;
+}
+
+.lp-snag-pill.high {
+  background: rgba(239, 68, 68, 0.2);
+  color: #F87171;
+}
+
+.lp-snag-pill.resolved {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ADE80;
+}
+
+/* View 5: Financial EVA S-Curve SVG Graph */
+.lp-scurve-chart {
+  position: relative;
+  width: 100%;
+}
+
+.lp-scurve-legend {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.74rem;
+  color: #94A3B8;
+  margin-top: 4px;
+}
+
+/* --------------------------------------------------------------------------
+   RIGHT COLUMN: 5 Interactive Synced Feature Cards with Progress Bars
+   -------------------------------------------------------------------------- */
+.lp-showcase-feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lp-showcase-feature-card {
+  position: relative;
+  background: #FFFFFF;
+  border-radius: 14px;
+  padding: 14px 18px;
+  border: 1.5px solid #E2E8F0;
+  box-shadow: 0 2px 8px rgba(15, 29, 46, 0.03);
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.lp-showcase-feature-card:hover {
+  transform: translateX(4px);
+  border-color: #93C5FD;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.07);
+}
+
+.lp-showcase-feature-card.active {
+  background: #FFFFFF;
+  border-color: #2563EB;
+  box-shadow: 0 8px 24px -4px rgba(37, 99, 235, 0.16), 0 2px 6px rgba(0, 0, 0, 0.04);
+  transform: translateX(6px);
+}
+
+/* Feature Icon Box */
+.lp-feat-icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #F1F5F9;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.25s ease;
+}
+
+.lp-showcase-feature-card:hover .lp-feat-icon-box {
+  background: #EFF6FF;
+  color: #2563EB;
+}
+
+.lp-showcase-feature-card.active .lp-feat-icon-box {
+  background: #2563EB;
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+/* Feature Text */
+.lp-feat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+
+.lp-feat-eyebrow-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lp-feat-eyebrow {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #64748B;
+  font-family: var(--lp-font-heading, inherit);
+}
+
+.lp-showcase-feature-card.active .lp-feat-eyebrow {
+  color: #2563EB;
+}
+
+.lp-feat-title {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #0F1D2E;
+  line-height: 1.3;
+  margin: 0;
+  font-family: var(--lp-font-heading, inherit);
+}
+
+.lp-feat-subtext {
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: #64748B;
+  font-family: var(--lp-font-body, inherit);
+  margin: 0;
+}
+
+/* Progress bar inside active feature card */
+.lp-feat-progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: #2563EB;
+  border-radius: 0 2px 2px 0;
+  transition: width 0.1s linear;
+}
+
+/* --------------------------------------------------------------------------
+   RESPONSIVE DESIGN BREAKPOINTS
+   -------------------------------------------------------------------------- */
+@media (max-width: 1360px) {
+  .lp-showcase-grid {
+    grid-template-columns: 1fr 1.2fr;
+    gap: 32px;
+  }
+  .lp-showcase-feature-list {
+    grid-column: span 2;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 16px;
+  }
+}
+
+@media (max-width: 960px) {
+  .lp-showcase-grid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+  .lp-showcase-feature-list {
+    grid-column: span 1;
+    grid-template-columns: 1fr;
+  }
+  .lp-showcase-title {
+    font-size: 2rem;
+  }
+  .lp-laptop-chassis {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .lp-showcase-section {
+    padding: 60px 0;
+  }
+  .lp-showcase-container {
+    padding: 0 16px;
+  }
+  .lp-showcase-title {
+    font-size: 1.75rem;
+  }
+  .lp-showcase-desc {
+    font-size: 0.9rem;
+  }
+  .lp-showcase-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  .lp-btn-primary-showcase,
+  .lp-btn-secondary-showcase {
+    width: 100%;
+    justify-content: center;
+  }
+  .lp-dash-topbar {
+    padding: 8px 10px;
+  }
+  .lp-dash-tabs {
+    overflow-x: auto;
+    max-width: 180px;
+    scrollbar-width: none;
+  }
+  .lp-dash-tab-btn {
+    padding: 4px 8px;
+    font-size: 0.72rem;
+    white-space: nowrap;
+  }
+  .lp-dash-kpis {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .lp-laptop-screen-display {
+    min-height: 340px;
+  }
+}
+
+@media (max-width: 420px) {
+  .lp-showcase-title {
+    font-size: 1.5rem;
+  }
+  .lp-dash-body {
+    padding: 12px 10px;
+  }
+  .lp-laptop-screen-display {
+    min-height: 300px;
+  }
+}
