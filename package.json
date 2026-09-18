@@ -6,12 +6,25 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "server": "node backend/server.js",
+    "server:dev": "node --watch backend/server.js",
+    "test:backend": "node --test backend/tests/*.test.js",
+    "test:e2e": "node backend/scripts/verify_e2e.js",
+    "seed": "node backend/scripts/seed.js"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "chart.js": "^4.4.8",
     "clsx": "^2.1.1",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.7.0",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.475.0",
+    "mongoose": "^9.10.0",
     "react": "^19.0.0",
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.0.0",

@@ -76,23 +76,30 @@ class AuthManager {
       return { success: false, message: "Please enter your email and password." };
     }
 
-    // Match demo user or create a session with the selected role
-    let user = this.demoUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
-    
-    if (!user) {
-      // Allow any demo login
-      user = {
-        email: email,
-        name: email.split("@")[0].replace(".", " ").replace(/\b\w/g, l => l.toUpperCase()),
-        role: selectedRole || "Project Manager",
-        avatar: email.substring(0, 2).toUpperCase()
-      };
-    } else if (selectedRole) {
-      user.role = selectedRole;
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), password }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success && data.data?.user) {
+        if (data.data.token) {
+          localStorage.setItem('buildora_auth_token', data.data.token);
+        }
+        this.setSession(data.data.user);
+        return { success: true, user: data.data.user };
+      }
+      return { success: false, message: data?.message || "Authentication failed." };
+    } catch (err) {
+      // Offline fallback to seeded demo users
+      let user = this.demoUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
+      if (user) {
+        this.setSession(user);
+        return { success: true, user: user };
+      }
+      return { success: false, message: "Cannot connect to Buildora API server." };
     }
-
-    this.setSession(user);
-    return { success: true, user: user };
   }
 
   async register(userData) {
@@ -100,16 +107,30 @@ class AuthManager {
       return { success: false, message: "Please fill in all required fields." };
     }
 
-    const newUser = {
-      name: userData.fullName,
-      email: userData.email,
-      role: userData.role || "Project Manager",
-      phone: userData.phone || "",
-      avatar: userData.fullName.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase()
-    };
-
-    this.setSession(newUser);
-    return { success: true, user: newUser };
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: (userData.fullName || '').trim(),
+          email: (userData.email || '').trim(),
+          password: userData.password,
+          role: userData.role || 'Project Manager',
+          phone: userData.phone || '',
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success && data.data?.user) {
+        if (data.data.token) {
+          localStorage.setItem('buildora_auth_token', data.data.token);
+        }
+        this.setSession(data.data.user);
+        return { success: true, user: data.data.user };
+      }
+      return { success: false, message: data?.message || "Registration failed." };
+    } catch (err) {
+      return { success: false, message: "Cannot connect to Buildora API server." };
+    }
   }
 
   logout() {

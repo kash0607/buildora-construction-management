@@ -503,6 +503,8 @@ export default function ProjectDetails() {
                 to={
                   activeTab === 'site-reports'
                     ? '/site-reports'
+                    : activeTab === 'materials'
+                    ? '/materials'
                     : activeTab === 'procurement'
                     ? '/approvals'
                     : '/dashboard'

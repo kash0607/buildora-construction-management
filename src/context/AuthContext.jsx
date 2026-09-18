@@ -1,5 +1,23 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { INITIAL_MOCK_DATA } from '../services/mockData';
+import { api, getAuthToken, setAuthToken } from '../services/api';
+
+export const SYSTEM_ROLES = [
+  { id: 'project-manager', name: 'Project Manager', description: 'Manage projects, schedules, budgets & approvals' },
+  { id: 'admin', name: 'Admin', description: 'Full enterprise access & governance' },
+  { id: 'site-supervisor', name: 'Site Supervisor', description: 'Daily site logs, worker counts & material receipts' },
+  { id: 'procurement-manager', name: 'Procurement Manager', description: 'Vendors, RFQs, Purchase Orders & deliveries' },
+  { id: 'finance', name: 'Finance', description: 'Budget allocation, disbursements & invoice audits' },
+  { id: 'client', name: 'Client', description: 'Executive milestones, approved photos & progress' },
+];
+
+export const SEEDED_DEMO_USERS = [
+  { email: 'kashish.pm@buildora.com', name: 'Kashish Patel', role: 'Project Manager', avatar: 'KP' },
+  { email: 'admin@buildora.com', name: 'Vikram Malhotra', role: 'Admin', avatar: 'VM' },
+  { email: 'sanjay.site@buildora.com', name: 'Sanjay Verma', role: 'Site Supervisor', avatar: 'SV' },
+  { email: 'finance@buildora.com', name: 'Ananya Iyer', role: 'Finance', avatar: 'AI' },
+  { email: 'procurement@buildora.com', name: 'Rohan Gupta', role: 'Procurement Manager', avatar: 'RG' },
+  { email: 'client.rep@lodha.com', name: 'Rajesh Oberoi', role: 'Client', avatar: 'RO' },
+];
 
 const AuthContext = createContext(null);
 const SESSION_KEY = 'buildora_auth_session';
@@ -12,86 +30,121 @@ export function AuthProvider({ children }) {
     } catch {
       // Fallback
     }
-    // Default logged in demo persona
-    const defaultUser = INITIAL_MOCK_DATA.currentUser;
-    localStorage.setItem(SESSION_KEY, JSON.stringify(defaultUser));
-    return defaultUser;
+    return null;
   });
 
-  const demoUsers = INITIAL_MOCK_DATA.demoUsers;
-  const roles = INITIAL_MOCK_DATA.roles;
+  const [loading, setLoading] = useState(true);
 
-  const setSession = (user) => {
-    setCurrentUser(user);
-    if (user) {
-      localStorage.setItem(SESSION_KEY, JSON.stringify(user));
-    } else {
-      localStorage.removeItem(SESSION_KEY);
+  const demoUsers = SEEDED_DEMO_USERS;
+  const roles = SYSTEM_ROLES;
+
+  // Verify and hydrate current user from backend /api/auth/me on mount/refresh
+  useEffect(() => {
+    let isMounted = true;
+
+    async function verifySession() {
+      const token = getAuthToken();
+      if (!token) {
+        if (isMounted) {
+          setCurrentUser(null);
+          localStorage.removeItem(SESSION_KEY);
+          setLoading(false);
+        }
+        return;
+      }
+
+      try {
+        const res = await api.getMe();
+        if (isMounted) {
+          if (res.success && res.data) {
+            setCurrentUser(res.data);
+            localStorage.setItem(SESSION_KEY, JSON.stringify(res.data));
+          } else {
+            // Token expired or invalid
+            setCurrentUser(null);
+            setAuthToken(null);
+            localStorage.removeItem(SESSION_KEY);
+          }
+        }
+      } catch {
+        // Network issue: keep cached session if available
+      } finally {
+        if (isMounted) setLoading(false);
+      }
     }
-  };
 
-  const login = async (email, password, selectedRole = null) => {
+    verifySession();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const login = async (email, password) => {
     if (!email || !password) {
       return { success: false, message: 'Please enter both your email and password.' };
     }
 
-    let user = demoUsers.find((u) => u.email.toLowerCase() === email.toLowerCase());
+    const res = await api.login(email, password);
 
-    if (!user) {
-      user = {
-        id: 'usr-' + Math.floor(10 + Math.random() * 90),
-        email: email,
-        name: email.split('@')[0].replace('.', ' ').replace(/\b\w/g, (l) => l.toUpperCase()),
-        role: selectedRole || 'Project Manager',
-        avatar: email.substring(0, 2).toUpperCase(),
-        phone: '+91 98765 43210'
-      };
-    } else if (selectedRole) {
-      user = { ...user, role: selectedRole };
+    if (res.success && res.data?.user) {
+      setCurrentUser(res.data.user);
+      localStorage.setItem(SESSION_KEY, JSON.stringify(res.data.user));
+      return { success: true, user: res.data.user };
     }
 
-    setSession(user);
-    return { success: true, user };
+    return {
+      success: false,
+      message: res.message || 'Authentication failed. Please check your credentials.',
+    };
   };
 
   const register = async (userData) => {
-    if (!userData.fullName || !userData.email || !userData.password) {
-      return { success: false, message: 'Please fill in all required fields.' };
+    if (!userData.fullName && !userData.name) {
+      return { success: false, message: 'Full name is required.' };
+    }
+    if (!userData.email || !userData.password) {
+      return { success: false, message: 'Email and password are required.' };
     }
 
-    const newUser = {
-      id: 'usr-' + Math.floor(10 + Math.random() * 90),
-      name: userData.fullName,
-      email: userData.email,
-      role: userData.role || 'Project Manager',
-      phone: userData.phone || '',
-      avatar: userData.fullName.split(' ').map((n) => n[0]).join('').substring(0, 2).toUpperCase()
-    };
+    const res = await api.register(userData);
 
-    setSession(newUser);
-    return { success: true, user: newUser };
+    if (res.success && res.data?.user) {
+      setCurrentUser(res.data.user);
+      localStorage.setItem(SESSION_KEY, JSON.stringify(res.data.user));
+      return { success: true, user: res.data.user };
+    }
+
+    return {
+      success: false,
+      message: res.message || 'Registration failed. Please check input requirements.',
+      errors: res.errors,
+    };
   };
 
   const logout = () => {
-    setSession(null);
+    api.logout();
+    setCurrentUser(null);
   };
 
   const switchRole = (roleName) => {
     if (!currentUser) return;
     const updated = { ...currentUser, role: roleName };
-    setSession(updated);
+    setCurrentUser(updated);
+    localStorage.setItem(SESSION_KEY, JSON.stringify(updated));
   };
 
   return (
     <AuthContext.Provider
       value={{
         currentUser,
+        loading,
         demoUsers,
         roles,
         login,
         register,
         logout,
-        switchRole
+        switchRole,
       }}
     >
       {children}

@@ -90,17 +90,17 @@ export default function Dashboard() {
 
   // Chart data setup
   const barChartData = {
-    labels: analytics?.expenseTrends?.labels || ["Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep (Proj)"],
+    labels: analytics?.expenseTrends?.labels || ['Apr 2026', 'May 2026', 'Jun 2026', 'Jul 2026', 'Aug 2026', 'Sep 2026'],
     datasets: [
       {
         label: 'Budget Allocation (₹ Cr)',
-        data: analytics?.expenseTrends?.budgeted || [4.2, 4.5, 5.0, 4.8, 5.2, 4.9, 5.5],
+        data: analytics?.expenseTrends?.budgeted || [0, 0, 0, 0, 0, 0],
         backgroundColor: '#B88A5A',
         borderRadius: 4
       },
       {
         label: 'Incurred Expenditure (₹ Cr)',
-        data: analytics?.expenseTrends?.actual || [3.8, 4.1, 4.9, 4.6, 5.4, 4.7, 5.1],
+        data: analytics?.expenseTrends?.actual || [0, 0, 0, 0, 0, 0],
         backgroundColor: '#463326',
         borderRadius: 4
       }
@@ -143,7 +143,7 @@ export default function Dashboard() {
     labels: analytics?.projectHealth?.labels || ["Completed", "Active On-Track", "Under Review", "Planning"],
     datasets: [
       {
-        data: analytics?.projectHealth?.counts || [4, 8, 3, 2],
+        data: analytics?.projectHealth?.counts || [0, 0, 0, 0],
         backgroundColor: analytics?.projectHealth?.colors || ["#2E7D32", "#6B4F3A", "#D97706", "#8A684C"],
         borderWidth: 2,
         borderColor: '#FFFFFF'
@@ -184,6 +184,9 @@ export default function Dashboard() {
     year: 'numeric'
   });
 
+  const activeSitesCount = stats?.activeProjects ?? 0;
+  const pendingApprovalsCount = stats?.pendingApprovals ?? approvals.length;
+
   return (
     <>
       {/* Welcome Banner with Wix-inspired Earthy Aesthetic */}
@@ -195,7 +198,7 @@ export default function Dashboard() {
           </div>
           <h2 className="welcome-title">Good Morning, {currentUser?.name?.split(' ')[0] || 'Kashish'}</h2>
           <p className="welcome-subtitle">
-            12 active construction sites are operational today. 5 urgent purchase requests require your sign-off before 2:00 PM.
+            {activeSitesCount} active construction site{activeSitesCount === 1 ? '' : 's'} operational today. {pendingApprovalsCount} pending request{pendingApprovalsCount === 1 ? '' : 's'} currently in review queue.
           </p>
         </div>
 
@@ -229,13 +232,13 @@ export default function Dashboard() {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
             </div>
           </div>
-          <div className="stat-value">{stats?.activeProjects || 12}</div>
+          <div className="stat-value">{stats?.activeProjects ?? 0}</div>
           <div className="stat-footer">
             <span className="stat-trend up">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="18 15 12 9 6 15"/></svg>
-              +2
+              {stats?.activeProjects ?? 0}
             </span>
-            <span>sites active this mo.</span>
+            <span>sites active</span>
           </div>
         </div>
 
@@ -247,9 +250,9 @@ export default function Dashboard() {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
             </div>
           </div>
-          <div className="stat-value">{stats?.totalBudgetFormatted || '₹48.0 Cr'}</div>
+          <div className="stat-value">{stats?.totalBudgetFormatted || '₹0.0 Cr'}</div>
           <div className="stat-footer">
-            <span className="text-muted">Across 12 major sites</span>
+            <span className="text-muted">Across {stats?.totalProjects ?? stats?.activeProjects ?? 0} registered sites</span>
           </div>
         </div>
 
@@ -261,9 +264,9 @@ export default function Dashboard() {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
             </div>
           </div>
-          <div className="stat-value">{stats?.budgetUsedFormatted || '₹29.0 Cr'}</div>
+          <div className="stat-value">{stats?.budgetUsedFormatted || '₹0.0 Cr'}</div>
           <div className="stat-footer">
-            <span className="stat-trend neutral font-semibold">{stats?.budgetPercentage || 60.4}%</span>
+            <span className="stat-trend neutral font-semibold">{stats?.budgetPercentage ?? 0}%</span>
             <span>committed to date</span>
           </div>
         </div>
@@ -278,8 +281,8 @@ export default function Dashboard() {
           </div>
           <div className="stat-value text-primary">{stats?.pendingApprovals ?? approvals.length}</div>
           <div className="stat-footer">
-            <span className="stat-trend down font-semibold">5 Urgent</span>
-            <span>require PM sign-off</span>
+            <span className="stat-trend down font-semibold">{stats?.pendingApprovalsUrgent ?? 0} Urgent</span>
+            <span>require review</span>
           </div>
         </div>
 
@@ -291,7 +294,7 @@ export default function Dashboard() {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             </div>
           </div>
-          <div className="stat-value" style={{ color: 'var(--color-danger)' }}>{stats?.overdueTasks || 7}</div>
+          <div className="stat-value" style={{ color: 'var(--color-danger)' }}>{stats?.overdueTasks ?? 0}</div>
           <div className="stat-footer">
             <span className="stat-trend down">Critical path</span>
             <span>flagged</span>
@@ -306,9 +309,9 @@ export default function Dashboard() {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/></svg>
             </div>
           </div>
-          <div className="stat-value">{stats?.lowStockItems || 9}</div>
+          <div className="stat-value">{stats?.lowStockItems ?? 0}</div>
           <div className="stat-footer">
-            <span className="text-muted">Rebar & Cement reorder</span>
+            <span className="text-muted">Reorder alert items</span>
           </div>
         </div>
       </section>

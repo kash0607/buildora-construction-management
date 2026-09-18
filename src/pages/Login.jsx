@@ -10,7 +10,7 @@ export default function Login() {
   const location = useLocation();
 
   const [email, setEmail] = useState('kashish.pm@buildora.com');
-  const [password, setPassword] = useState('password123');
+  const [password, setPassword] = useState('Password123!');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -56,17 +56,19 @@ export default function Login() {
 
   const quickFill = async (demoEmail, role) => {
     setEmail(demoEmail);
-    setPassword('password123');
+    setPassword('Password123!');
     setEmailError(false);
     setPasswordError(false);
     showToast(`Selected ${role} credentials. Signing in...`, 'info', 1500);
 
     setLoading(true);
     setTimeout(async () => {
-      const res = await login(demoEmail, 'password123', role);
+      const res = await login(demoEmail, 'Password123!', role);
       if (res.success) {
         showToast('Signed in successfully!', 'success');
         navigate('/dashboard', { replace: true });
+      } else {
+        showToast(res.message || 'Login failed', 'danger');
       }
       setLoading(false);
     }, 400);

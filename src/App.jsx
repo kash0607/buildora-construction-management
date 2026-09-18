@@ -14,6 +14,8 @@ import Tasks from './pages/Tasks';
 import SiteReports from './pages/SiteReports';
 import Issues from './pages/Issues';
 import Approvals from './pages/Approvals';
+import Materials from './pages/Materials';
+import Inventory from './pages/Inventory';
 import NotFound from './pages/NotFound';
 
 export default function App() {
@@ -42,6 +44,8 @@ export default function App() {
             <Route path="site-reports" element={<SiteReports />} />
             <Route path="issues" element={<Issues />} />
             <Route path="approvals" element={<Approvals />} />
+            <Route path="materials" element={<Materials />} />
+            <Route path="inventory" element={<Inventory />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
