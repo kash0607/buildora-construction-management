@@ -1,0 +1,266 @@
+/* ==========================================================================
+   BUILDORA - GLOBAL DESIGN SYSTEM & TOKENS
+   Enterprise Construction Operations Typography & Color System
+   ========================================================================== */
+
+/* Preserved typography loaded via index.html link tags */
+
+:root {
+  /* Navy Foundations */
+  --color-dark-navy: #0B1B2B;
+  --color-secondary-navy: #132A3E;
+  --color-dark-brown: #0B1B2B; /* Preserved token mapped to Primary Dark Navy */
+  --color-secondary-brown: #6B4935;
+
+  /* Brand Accents */
+  --color-primary-brown: #6B4935;
+  --color-warm-tan: #B98958;
+  --color-accent: #B98958;
+  --color-accent-hover: #A57849;
+  --color-muted-gold: #C49A68;
+
+  /* Neutrals & Surfaces */
+  --color-warm-ivory: #F7F4EE;
+  --color-warm-sand: #F7F4EE; /* Main dashboard background */
+  --color-warm-beige: #E3DED5;
+  --color-cream: #FFFFFF;
+  --color-white: #FFFFFF;
+  
+  /* Text Colors */
+  --color-text-dark: #172333;
+  --color-text-card-title: #243447;
+  --color-text-body: #64748B;
+  --color-text-muted: #7B8794;
+  --color-text-label: #6B7280;
+  --color-text-light: #8A96A3;
+  --color-text-on-dark: #FFFFFF;
+
+  /* Border & Dividers */
+  --color-border: #E3DED5;
+  --color-border-subtle: #E8E3DA;
+  --color-border-input: #D7DDE3;
+  --color-border-focus: #6B4935;
+
+  /* Functional Status Colors */
+  --color-success: #5F8A68;
+  --color-success-bg: #EEF5EF;
+  --color-success-border: #D1E5D6;
+
+  --color-warning: #C58A3A;
+  --color-warning-bg: #FBF3E6;
+  --color-warning-border: #F3DEC2;
+
+  --color-danger: #B85C55;
+  --color-danger-bg: #F9EEEE;
+  --color-danger-border: #F0C9C6;
+
+  --color-info: #547AA5;
+  --color-info-bg: #EEF3F8;
+  --color-info-border: #D2E0EE;
+
+  /* Typography */
+  --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(11, 27, 43, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(11, 27, 43, 0.06), 0 2px 4px -2px rgba(11, 27, 43, 0.03);
+  --shadow-lg: 0 10px 15px -3px rgba(11, 27, 43, 0.07), 0 4px 6px -4px rgba(11, 27, 43, 0.03);
+  --shadow-xl: 0 20px 25px -5px rgba(11, 27, 43, 0.08), 0 8px 10px -6px rgba(11, 27, 43, 0.04);
+  --shadow-card: 0 1px 3px rgba(11, 27, 43, 0.04), 0 1px 2px rgba(11, 27, 43, 0.02);
+  --shadow-glow: 0 0 15px rgba(185, 137, 88, 0.18);
+
+  /* Radii (UNCHANGED) */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* Layout dimensions */
+  --sidebar-width: 260px;
+  --sidebar-collapsed-width: 80px;
+  --navbar-height: 72px;
+
+  /* Transitions (UNCHANGED) */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 350ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ==========================================================================
+   CSS RESET & BASE STYLES
+   ========================================================================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: #F7F4EE;
+  color: #172333;
+  line-height: 1.5;
+  min-height: 100vh;
+  overflow-x: clip;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  color: #172333;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+
+h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  color: #172333;
+}
+
+h2 {
+  font-size: 1.75rem;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  color: #172333;
+}
+
+h3 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: #172333;
+}
+
+h4 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #243447;
+}
+
+h5 {
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: #243447;
+}
+
+h6 {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #243447;
+}
+
+p {
+  color: #64748B;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 0.6rem;
+  font-weight: 400;
+}
+
+a {
+  color: #6B4935;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: #B98958;
+}
+
+img, svg {
+  display: block;
+  max-width: 100%;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F7F4EE;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #E3DED5;
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #B98958;
+}
+
+/* Utilities */
+.text-muted { color: #7B8794; }
+.text-dark { color: #172333; }
+.text-primary { color: #6B4935; }
+.text-accent { color: #B98958; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+
+.flex { display: flex; }
+.flex-col { display: flex; flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.gap-1 { gap: 0.25rem; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-4 { gap: 1rem; }
+.gap-6 { gap: 1.5rem; }
+
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Screen reader utility for WCAG accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Global accessible keyboard focus indicator */
+:focus-visible {
+  outline: 2px solid #6B4935;
+  outline-offset: 2px;
+}
