@@ -2,127 +2,109 @@
 
 ### Construction Project & Operations Management Platform
 
-BUILDORA is a modern construction management platform designed to help teams manage projects, monitor progress, track site activities, handle issues, and keep essential project information organized in one place.
+[![React](https://img.shields.io/badge/Frontend-React%2019-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Bundler-Vite%206-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Express](https://img.shields.io/badge/Backend-Express%205-000000?logo=express&logoColor=white)](https://expressjs.com/)
+[![MongoDB](https://img.shields.io/badge/Database-MongoDB-47A248?logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-It provides a centralized workspace for construction operations while keeping the interface simple, clear, and easy to navigate.
+**BUILDORA** is a modern, full-stack construction operations platform designed to help teams manage projects, track field activities, monitor progress, control inventory, and streamline approvals in one unified workspace.
 
----
-
-## Overview
-
-Construction projects often struggle with fragmented communication, scattered spreadsheets, unrecorded site activities, and delayed decision-making. Important updates are frequently trapped in messaging threads or manual site logs, making it difficult for teams and stakeholders to track real progress.
-
-BUILDORA addresses these challenges by bringing project planning, site operations, quality management, inventory tracking, and approvals into a single unified platform. Teams can maintain clear accountability, monitor timelines and budgets, and ensure that field and office personnel stay aligned throughout the construction lifecycle.
+It replaces fragmented communication, manual spreadsheets, and disconnected site diaries with a clean, centralized system accessible to both field personnel and executive management.
 
 ---
 
-## Architecture Overview
+## What Problem Does BUILDORA Solve?
 
-BUILDORA uses a decoupled full-stack architecture with a React client communicating with a Node.js REST API:
+Construction projects often suffer from schedule delays, budget overruns, unrecorded field issues, and untracked material usage. Information is often scattered across chat groups, paper logs, and disparate files.
+
+BUILDORA provides a single source of truth that connects jobsites with head-office project controllers:
+- **Centralized Project Oversight**: View health, timelines, and budgets across your entire project portfolio.
+- **Field-to-Office Traceability**: Capture daily logs, safety issues, and material requisitions directly from the site.
+- **Governance & Approvals**: Ensure requisitions and milestone completions pass through verified review workflows.
+
+---
+
+## System Architecture
+
+BUILDORA is built on a clean full-stack architecture with a React single-page application communicating with an Express REST API:
 
 ```text
-Frontend (React + Vite)
-       ↓
-    REST API
-       ↓
-Backend (Node.js + Express)
-       ↓
-Database (MongoDB + Mongoose)
+React 19 Frontend (Vite)
+          │
+          ▼  REST API (JWT Bearer Auth)
+Express 5 Backend (Node.js)
+          │
+          ▼  Mongoose 9 ODM
+   MongoDB Database
 ```
 
-For detailed API specifications and request/response contracts, refer to [backend/API.md](backend/API.md).
+For complete endpoint contracts, request/response formats, and error codes, refer to [backend/API.md](backend/API.md).
 
 ---
 
 ## Core Features
 
-### Project Management
-- Project portfolio directory with status, timeline, and location filters
-- Progress tracking and milestone scheduling
-- Sanctioned budget vs. incurred expenditure tracking
-- Client and project manager assignment
-- Project creation, editing, and archiving
+### 🏗️ Project Management
+- **Portfolio Directory**: Search, filter, and track all active and planned projects.
+- **Budget & Cost Tracking**: Monitor sanctioned budgets versus actual expenses.
+- **Milestone Scheduling**: Align target deliverables with overall project timelines.
+- **Project Dossier**: Detailed project records with linked tasks, site reports, and manager assignments.
 
-### Task & Progress Management
-- Task creation, assignment, and status updates
-- Priority levels, start dates, and due date management
-- Task dependencies and milestone linkage
-- Multiple views: Table view, Kanban board, and Timeline / Gantt overview
-- Progress percentage tracking
+### 📋 Tasks & Progress
+- **Task Scheduling**: Create and assign work packages with start dates, deadlines, and priorities.
+- **Multi-View Modes**: Switch effortlessly between **Table**, **Kanban Board**, and **Timeline / Gantt** views.
+- **Dependencies & Milestones**: Link trade activities to prerequisites to prevent out-of-order execution.
+- **Progress Tracking**: Real-time percentage tracking normalized across parent phases.
 
-### Site Reports
-- Daily site logs capturing daily work performed
-- Workforce headcount and subcontractor tracking
-- Weather conditions and site impact observations
-- Safety incidents and hazard documentation
+### 📝 Daily Site Reports
+- **Site Diaries**: Record daily work progress, active work zones, and subcontractors on duty.
+- **Workforce Logging**: Track labor headcounts across various trades and shifts.
+- **Site Conditions**: Log weather conditions, equipment operations, and site observations.
+- **Safety Logs**: Document safety checks, hazards, and field incidents.
 
-### Issues & Quality
-- Field issue reporting with severity classification (Critical, High, Medium, Low)
-- Defect categorisation by trade (Structural, Electrical, Plumbing, HVAC, Architectural)
-- Assignment and resolution tracking
-- Status lifecycle from open to investigation, resolution, and closure
+### ⚠️ Issues & Quality Assurance
+- **Defect Reporting**: Log field defects with priority flags (`Critical`, `High`, `Medium`, `Low`).
+- **Trade Categorization**: Classify issues by trade (Structural, Electrical, Plumbing, HVAC, Architectural).
+- **Resolution Lifecycle**: Track defects from open inquiry to verified closure.
 
-### Materials & Inventory
-- Master catalog of construction materials and standard unit metrics
-- Real-time warehouse and on-site stock levels
-- Stock movement logs (Inbound receipts, Outbound issues, and Adjustments)
-- Low-stock and shortage threshold indicators
-- Material requisitions linked to active jobsites
+### 📦 Materials & Inventory
+- **Master Materials Catalog**: Standard catalog of construction materials with unit metrics.
+- **Warehouse & Site Stock**: Live visibility of on-hand inventory across all site locations.
+- **Stock Movement Ledger**: Log audited movements (`Inbound`, `Outbound`, and `Adjustments`).
+- **Shortage Alerts**: Automatic indicators when inventory dips below minimum buffer stock.
 
-### Approvals
-- Requisition and purchase request submission
-- Multi-tier approval workflows with approval/rejection actions
-- Reviewer remarks and timestamped audit history
+### ✅ Approvals & Requisitions
+- **Material Requisitions**: Field superintendents can draft and submit supply requests directly.
+- **Review Queue**: Managers review, approve, or reject pending requests with feedback notes.
+- **Audit History**: Complete timestamped logs of all approvals and rejections.
 
-### Dashboard
-- Executive overview of active projects and total budgets
-- Visual KPI cards for open issues, pending approvals, and active tasks
-- Interactive charts showing project progress curves and status distributions
-- Recent site activity feed and upcoming milestone schedules
-- Global project filter for focused analysis
+### 📊 Executive Dashboard
+- **Telemetry KPIs**: Live summaries of active projects, open defects, pending approvals, and budget burn rate.
+- **Analytics Charts**: Interactive visual charts rendering progress curves and task distributions.
+- **Live Activity Feed**: Chronological log of recent site submissions and project updates.
+- **Global Project Filter**: Toggle analytics across the entire portfolio or focus on a single site.
 
 ---
 
 ## User Roles
 
-BUILDORA organizes access around primary operational experiences:
+BUILDORA provides tailored experiences based on user responsibilities:
 
-- **Admin / Management**: Full operational control to create and manage projects, assign tasks, review site reports, resolve issues, control inventory movements, process approvals, and manage system users. Specific roles including Project Manager, Site Supervisor, and Procurement Officer operate within this tier.
-- **Client**: Read-only stakeholder access to monitor project progress, milestone achievements, approved site reports, and high-level project status.
+- **Admin / Management**: Full operational control to manage projects, schedule tasks, review site reports, resolve defects, control inventory movements, process approvals, and manage user accounts. (Includes specialized roles for Project Managers, Site Supervisors, and Procurement Officers).
+- **Client / Stakeholder**: Clean, read-only interface to monitor overall project progress, key milestones, approved site reports, and high-level expenditure.
 
 ---
 
 ## Tech Stack
 
-### Frontend
-- React 19
-- Vite
-- React Router
-- Chart.js & react-chartjs-2
-- Lucide React
-- Framer Motion
-- Vanilla CSS
-
-### Backend
-- Node.js
-- Express
-- MongoDB
-- Mongoose
-
-### Authentication & Security
-- JSON Web Tokens (JWT)
-- bcryptjs
-- Helmet
-- CORS
-- Express Rate Limit
-
----
-
-## API
-
-BUILDORA provides a RESTful API powering all frontend operations, including authentication, project management, tasks, site reports, issues, inventory, and approvals.
-
-For detailed endpoint documentation, request/response formats, and status codes, see [backend/API.md](backend/API.md).
+| Layer | Technologies |
+| :--- | :--- |
+| **Frontend** | React 19, Vite 6, React Router v7, Chart.js, Lucide Icons, Framer Motion, Vanilla CSS |
+| **Backend** | Node.js (ES Modules), Express 5, Mongoose 9 |
+| **Database** | MongoDB |
+| **Security & Auth** | JSON Web Tokens (JWT), bcryptjs, Helmet, CORS, Express Rate Limit |
+| **Testing** | Node.js Native Test Runner (`node --test`) |
 
 ---
 
@@ -132,26 +114,26 @@ For detailed endpoint documentation, request/response formats, and status codes,
 buildora-construction-management/
 ├── backend/
 │   ├── config/             # Database and server configuration
-│   ├── controllers/        # Route controllers and request handling
-│   ├── middleware/         # Authentication, authorization, and error handling
-│   ├── models/             # Mongoose schemas (User, Project, Task, etc.)
-│   ├── routes/             # Express API route definitions
-│   ├── scripts/            # Database seeding and utility scripts
-│   ├── services/           # Core business logic and rules
+│   ├── controllers/        # Request handling and business logic
+│   ├── middleware/         # JWT authentication, RBAC, and error handlers
+│   ├── models/             # Mongoose data schemas (Project, Task, User, etc.)
+│   ├── routes/             # REST API endpoint definitions
+│   ├── scripts/            # Database seed script & test utilities
+│   ├── services/           # Business rule engines (dependencies, budget formulas)
 │   ├── tests/              # Automated unit and integration test suite
-│   ├── API.md              # Full REST API endpoint reference
-│   └── server.js           # Backend application entrypoint
+│   ├── API.md              # Complete REST API specification
+│   └── server.js           # Express server entrypoint
 ├── frontend/
 │   ├── src/
-│   │   ├── components/     # Reusable UI elements, modals, and layout
-│   │   ├── context/        # Auth and global filter state
-│   │   ├── pages/          # Application views and dashboard pages
+│   │   ├── components/     # UI primitives, modals, layout, and page components
+│   │   ├── context/        # Auth and global project filter contexts
+│   │   ├── pages/          # Dashboard, Projects, Tasks, Reports, Inventory, etc.
 │   │   ├── services/       # Frontend API communication layer
-│   │   └── styles/         # Global stylesheets and design tokens
+│   │   └── styles/         # Design tokens, color system, and layout styles
 │   ├── index.html          # HTML entrypoint
-│   └── vite.config.js      # Vite configuration
-├── package.json            # Monorepo scripts and workspace configuration
-└── README.md               # Product documentation
+│   └── vite.config.js      # Vite bundling configuration
+├── package.json            # Monorepo workspaces and npm scripts
+└── README.md               # Project documentation
 ```
 
 ---
@@ -161,7 +143,7 @@ buildora-construction-management/
 ### Prerequisites
 - **Node.js**: v18.0.0 or higher
 - **npm**: v9.0.0 or higher
-- **MongoDB**: Local MongoDB instance or MongoDB Atlas connection
+- **MongoDB**: Local MongoDB instance (`mongodb://localhost:27017`) or MongoDB Atlas connection URI
 
 ### 1. Clone & Install
 ```bash
@@ -170,7 +152,7 @@ cd buildora-construction-management
 npm install
 ```
 
-### 2. Configure Environment
+### 2. Configure Environment Variables
 Create a `.env` file in the root directory:
 ```env
 PORT=5000
@@ -181,30 +163,36 @@ JWT_EXPIRES_IN=7d
 CORS_ORIGIN=http://localhost:5173
 ```
 
-### 3. Seed Demo Data (Optional)
-Populate the database with sample projects, tasks, materials, and users:
+### 3. Seed Database (Optional)
+Populate the database with sample construction projects, tasks, materials, and users:
 ```bash
 npm run seed
 ```
 
-### 4. Run the Application
-In one terminal, start the backend server:
+*Default Demo Credentials:*
+- **Project Manager**: `kashish.pm@buildora.com` / `Password123!`
+- **Site Supervisor**: `zaara.site@buildora.com` / `Password123!`
+- **Procurement Officer**: `isika.procure@buildora.com` / `Password123!`
+
+### 4. Start Development Servers
+
+**Backend API:**
 ```bash
 npm run server
+# Running at http://localhost:5000
 ```
 
-In a second terminal, start the frontend development server:
+**Frontend Client:**
 ```bash
 npm run dev
+# Running at http://localhost:5173
 ```
-
-The application will be accessible at `http://localhost:5173`.
 
 ---
 
-## Testing
+## Automated Testing
 
-Run the automated backend test suite covering authentication, RBAC, project calculations, task dependencies, and stock rules:
+Run the automated backend test suite covering authorization, dependency validation, budget calculations, and stock movements:
 
 ```bash
 npm run test:backend
@@ -214,4 +202,4 @@ npm run test:backend
 
 ## License
 
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
