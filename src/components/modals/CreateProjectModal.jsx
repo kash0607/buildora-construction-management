@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from '../common/Modal';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
@@ -8,24 +8,87 @@ export default function CreateProjectModal({ isOpen, onClose, onProjectCreated }
   const { currentUser } = useAuth();
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [managers, setManagers] = useState([]);
+  const [clients, setClients] = useState([]);
+
+  const today = new Date().toISOString().split('T')[0];
+  const targetDate = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
   const [formData, setFormData] = useState({
     name: '',
     client: '',
+    clientUser: '',
     location: '',
-    manager: 'Kashish Patel',
+    manager: currentUser?.name || '',
+    managerUser: currentUser?._id || '',
     budget: '',
     status: 'Planning',
-    startDate: '2026-09-15',
-    deadline: '2028-03-31',
+    startDate: today,
+    deadline: targetDate,
     description: ''
   });
 
+  useEffect(() => {
+    if (isOpen) {
+      // Load real managers and clients
+      const loadUsers = async () => {
+        try {
+          const [pmRes, clientRes] = await Promise.all([
+            api.getUsers('Project Manager'),
+            api.getUsers('Client'),
+          ]);
+
+          if (pmRes.success && pmRes.data?.length > 0) {
+            setManagers(pmRes.data);
+            if (!formData.managerUser) {
+              const matched = pmRes.data.find((m) => m._id === currentUser?._id) || pmRes.data[0];
+              setFormData((prev) => ({
+                ...prev,
+                manager: matched.name,
+                managerUser: matched._id,
+              }));
+            }
+          }
+
+          if (clientRes.success && clientRes.data?.length > 0) {
+            setClients(clientRes.data);
+          }
+        } catch {
+          // Non-blocking user fetch
+        }
+      };
+
+      loadUsers();
+    }
+  }, [isOpen, currentUser]);
+
   const handleChange = (e) => {
     const { id, name, value } = e.target;
+    const key = name || id;
+
+    if (key === 'managerUser') {
+      const selected = managers.find((m) => m._id === value);
+      setFormData((prev) => ({
+        ...prev,
+        managerUser: value,
+        manager: selected ? selected.name : prev.manager,
+      }));
+      return;
+    }
+
+    if (key === 'clientUser') {
+      const selected = clients.find((c) => c._id === value);
+      setFormData((prev) => ({
+        ...prev,
+        clientUser: value,
+        client: selected ? selected.name : prev.client,
+      }));
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
-      [name || id]: value
+      [key]: value
     }));
   };
 
@@ -44,12 +107,14 @@ export default function CreateProjectModal({ isOpen, onClose, onProjectCreated }
         setFormData({
           name: '',
           client: '',
+          clientUser: '',
           location: '',
-          manager: currentUser ? currentUser.name : 'Kashish Patel',
+          manager: currentUser ? currentUser.name : '',
+          managerUser: currentUser?._id || '',
           budget: '',
           status: 'Planning',
-          startDate: '2026-09-15',
-          deadline: '2028-03-31',
+          startDate: today,
+          deadline: targetDate,
           description: ''
         });
         if (onProjectCreated) onProjectCreated(res.data);
@@ -89,16 +154,45 @@ export default function CreateProjectModal({ isOpen, onClose, onProjectCreated }
               <label className="form-label" htmlFor="np-client">
                 Client / Developer <span className="required-mark">*</span>
               </label>
-              <input
-                type="text"
-                id="np-client"
-                name="client"
-                className="form-control"
-                placeholder="e.g. Oberoi Realty"
-                value={formData.client}
-                onChange={handleChange}
-                required
-              />
+              {clients.length > 0 ? (
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <select
+                    id="np-client-user"
+                    name="clientUser"
+                    className="form-control"
+                    value={formData.clientUser}
+                    onChange={handleChange}
+                  >
+                    <option value="">Select Registered Client</option>
+                    {clients.map((c) => (
+                      <option key={c._id} value={c._id}>
+                        {c.name} ({c.email})
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    type="text"
+                    id="np-client"
+                    name="client"
+                    className="form-control"
+                    placeholder="or enter company name"
+                    value={formData.client}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              ) : (
+                <input
+                  type="text"
+                  id="np-client"
+                  name="client"
+                  className="form-control"
+                  placeholder="e.g. Oberoi Realty"
+                  value={formData.client}
+                  onChange={handleChange}
+                  required
+                />
+              )}
             </div>
             <div className="form-group">
               <label className="form-label" htmlFor="np-location">
@@ -122,18 +216,34 @@ export default function CreateProjectModal({ isOpen, onClose, onProjectCreated }
               <label className="form-label" htmlFor="np-manager">
                 Project Manager <span className="required-mark">*</span>
               </label>
-              <select
-                id="np-manager"
-                name="manager"
-                className="form-control"
-                value={formData.manager}
-                onChange={handleChange}
-                required
-              >
-                <option value="Kashish Patel">Kashish Patel</option>
-                <option value="Vikram Malhotra">Vikram Malhotra</option>
-                <option value="Rahul Sharma">Rahul Sharma</option>
-              </select>
+              {managers.length > 0 ? (
+                <select
+                  id="np-manager"
+                  name="managerUser"
+                  className="form-control"
+                  value={formData.managerUser}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Select Project Manager</option>
+                  {managers.map((m) => (
+                    <option key={m._id} value={m._id}>
+                      {m.name} ({m.email})
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  type="text"
+                  id="np-manager"
+                  name="manager"
+                  className="form-control"
+                  value={formData.manager}
+                  onChange={handleChange}
+                  placeholder="Manager Name"
+                  required
+                />
+              )}
             </div>
             <div className="form-group">
               <label className="form-label" htmlFor="np-budget">

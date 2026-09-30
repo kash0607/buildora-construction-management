@@ -9,7 +9,7 @@ import { protect, authorizeRoles } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.get('/pending', protect, getPendingApprovals);
+router.get('/pending', protect, authorizeRoles('Admin', 'Project Manager', 'Finance'), getPendingApprovals);
 
 router
   .route('/')

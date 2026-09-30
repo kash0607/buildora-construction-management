@@ -358,3 +358,90 @@ export function validateStockIssue(currentStock, quantityToIssue) {
     balanceAfter: stock - qty,
   };
 }
+
+// ==========================================
+// 7. PROCUREMENT & DELIVERY RULES
+// ==========================================
+
+const PO_VALID_TRANSITIONS = {
+  Draft: ['Pending Approval', 'Cancelled'],
+  'Pending Approval': ['Approved', 'Rejected', 'Cancelled'],
+  Approved: ['Issued', 'Cancelled'],
+  Rejected: ['Draft'],
+  Issued: ['Partially Delivered', 'Delivered', 'Cancelled'],
+  'Partially Delivered': ['Delivered', 'Cancelled'],
+  Delivered: [],
+  Cancelled: [],
+};
+
+/**
+ * Validates state transition for Purchase Orders.
+ */
+export function validatePOTransition(currentStatus, nextStatus) {
+  if (currentStatus === nextStatus) {
+    return { valid: true };
+  }
+
+  const allowed = PO_VALID_TRANSITIONS[currentStatus];
+  if (!allowed || !allowed.includes(nextStatus)) {
+    return {
+      valid: false,
+      error: `Invalid Purchase Order transition from '${currentStatus}' to '${nextStatus}'. Allowed: [${(allowed || []).join(', ') || 'None (Terminal state)'}].`,
+    };
+  }
+
+  return { valid: true };
+}
+
+/**
+ * Calculates delivery fulfillment status across line items.
+ * @param {Array<{ quantity: number, receivedQuantity: number }>} items
+ * @returns {'Draft' | 'Issued' | 'Partially Delivered' | 'Delivered'}
+ */
+export function calculatePOFulfillmentStatus(items = []) {
+  if (!Array.isArray(items) || items.length === 0) return 'Issued';
+
+  let allCompleted = true;
+  let anyReceived = false;
+
+  for (const item of items) {
+    const ordered = Number(item.quantity) || 0;
+    const received = Number(item.receivedQuantity) || 0;
+
+    if (received > 0) anyReceived = true;
+    if (received < ordered) allCompleted = false;
+  }
+
+  if (allCompleted && anyReceived) return 'Delivered';
+  if (anyReceived) return 'Partially Delivered';
+  return 'Issued';
+}
+
+/**
+ * Validates delivery items against ordered items to prevent invalid receiving.
+ */
+export function validateDeliveryQuantities(poItems, deliveryItems) {
+  if (!Array.isArray(deliveryItems) || deliveryItems.length === 0) {
+    return { valid: false, error: 'Delivery must contain at least one item' };
+  }
+
+  for (const dItem of deliveryItems) {
+    const received = Number(dItem.receivedQuantity) || 0;
+    const accepted = Number(dItem.acceptedQuantity) || 0;
+    const rejected = Number(dItem.rejectedQuantity) || 0;
+
+    if (received < 0 || accepted < 0 || rejected < 0) {
+      return { valid: false, error: 'Delivery quantities cannot be negative' };
+    }
+
+    if (accepted + rejected !== received) {
+      return {
+        valid: false,
+        error: `Item '${dItem.name}': accepted (${accepted}) + rejected (${rejected}) must equal received (${received})`,
+      };
+    }
+  }
+
+  return { valid: true };
+}
+

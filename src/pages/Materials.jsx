@@ -43,8 +43,8 @@ export default function Materials() {
     name: '',
     category: 'Structural & Civil',
     unit: 'bag',
-    project: 'Skyline Heights',
-    projectId: 'PRJ-101',
+    project: '',
+    projectId: '',
     currentStock: '',
     minimumStock: '',
     reorderLevel: '',
@@ -54,8 +54,8 @@ export default function Materials() {
 
   const [requestForm, setRequestForm] = useState({
     materialName: '',
-    projectId: 'PRJ-101',
-    projectName: 'Skyline Heights',
+    projectId: '',
+    projectName: '',
     quantity: '',
     unit: 'bag',
     requiredByDate: '',
@@ -124,8 +124,8 @@ export default function Materials() {
       name: '',
       category: 'Structural & Civil',
       unit: 'bag',
-      project: projects[0]?.name || 'Skyline Heights',
-      projectId: projects[0]?.id || 'PRJ-101',
+      project: projects[0]?.name || '',
+      projectId: projects[0]?.projectId || projects[0]?.id || '',
       currentStock: '',
       minimumStock: '50',
       reorderLevel: '100',
@@ -142,8 +142,8 @@ export default function Materials() {
       name: material.name,
       category: material.category || 'Structural & Civil',
       unit: material.unit || 'bag',
-      project: material.project || 'Skyline Heights',
-      projectId: material.projectId || 'PRJ-101',
+      project: material.projectName || material.project || '',
+      projectId: material.projectId || material.project || '',
       currentStock: material.currentStock,
       minimumStock: material.minimumStock || 0,
       reorderLevel: material.reorderLevel || 10,
@@ -189,8 +189,8 @@ export default function Materials() {
     setRequestTargetMaterial(material);
     setRequestForm({
       materialName: material ? material.name : '',
-      projectId: material ? material.projectId : 'PRJ-101',
-      projectName: material ? material.project : 'Skyline Heights',
+      projectId: material ? (material.projectId || material.project || '') : (projects[0]?.projectId || projects[0]?.id || ''),
+      projectName: material ? (material.projectName || material.project || '') : (projects[0]?.name || ''),
       quantity: material ? String(Math.max(1, (material.reorderLevel || 10) * 2 - material.currentStock)) : '100',
       unit: material ? material.unit : 'bag',
       requiredByDate: new Date(Date.now() + 5 * 86400000).toISOString().split('T')[0],
@@ -420,7 +420,7 @@ export default function Materials() {
                         {mat.category}
                       </span>
                     </td>
-                    <td>{mat.project || mat.projectName || 'General Site Store'}</td>
+                    <td>{mat.project || mat.projectName || '—'}</td>
                     <td><span style={{ textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: 600 }}>{mat.unit}</span></td>
                     <td>
                       <strong style={{ color: mat.currentStock === 0 ? 'var(--color-danger)' : 'inherit' }}>
@@ -524,7 +524,7 @@ export default function Materials() {
                   setFormData({
                     ...formData,
                     projectId: e.target.value,
-                    project: p ? p.name : 'Skyline Heights'
+                    project: p ? p.name : ''
                   });
                 }}
               >
@@ -655,7 +655,7 @@ export default function Materials() {
                   setRequestForm({
                     ...requestForm,
                     projectId: e.target.value,
-                    projectName: p ? p.name : 'Skyline Heights'
+                    projectName: p ? p.name : ''
                   });
                 }}
               >

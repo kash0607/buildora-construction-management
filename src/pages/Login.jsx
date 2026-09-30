@@ -41,9 +41,11 @@ export default function Login() {
     setLoading(true);
     try {
       const res = await login(email, password);
-      if (res.success) {
+      if (res.success && res.user) {
         showToast('Login successful! Welcome to BUILDORA.', 'success');
-        const from = location.state?.from?.pathname || '/dashboard';
+        const role = res.user.role;
+        const defaultPath = role === 'Client' ? '/client-portal' : (role === 'Vendor' ? '/vendor-portal' : '/dashboard');
+        const from = location.state?.from?.pathname || defaultPath;
         navigate(from, { replace: true });
       } else {
         showToast(res.message || 'Authentication failed', 'danger');
@@ -60,19 +62,23 @@ export default function Login() {
     setPassword('Password123!');
     setEmailError(false);
     setPasswordError(false);
-    showToast(`Selected ${role} credentials. Signing in...`, 'info', 1500);
+    showToast(`Signing in as ${role}...`, 'info', 1200);
 
     setLoading(true);
-    setTimeout(async () => {
-      const res = await login(demoEmail, 'Password123!', role);
-      if (res.success) {
-        showToast('Signed in successfully!', 'success');
-        navigate('/dashboard', { replace: true });
+    try {
+      const res = await login(demoEmail, 'Password123!');
+      if (res.success && res.user) {
+        showToast(`Signed in as ${res.user.name} (${res.user.role})!`, 'success');
+        const targetPath = res.user.role === 'Client' ? '/client-portal' : (res.user.role === 'Vendor' ? '/vendor-portal' : '/dashboard');
+        navigate(targetPath, { replace: true });
       } else {
         showToast(res.message || 'Login failed', 'danger');
       }
+    } catch {
+      showToast('Login connection failed', 'danger');
+    } finally {
       setLoading(false);
-    }, 400);
+    }
   };
 
   return (
@@ -277,6 +283,13 @@ export default function Login() {
               <button
                 type="button"
                 className="demo-pill-btn"
+                onClick={() => quickFill('procurement@buildora.com', 'Procurement Manager')}
+              >
+                📦 Procurement
+              </button>
+              <button
+                type="button"
+                className="demo-pill-btn"
                 onClick={() => quickFill('finance@buildora.com', 'Finance')}
               >
                 💼 Finance
@@ -287,6 +300,13 @@ export default function Login() {
                 onClick={() => quickFill('client.rep@lodha.com', 'Client')}
               >
                 🏢 Client
+              </button>
+              <button
+                type="button"
+                className="demo-pill-btn"
+                onClick={() => quickFill('vendor@apexsteel.com', 'Vendor')}
+              >
+                🚚 Vendor
               </button>
             </div>
           </div>

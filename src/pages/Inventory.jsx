@@ -32,10 +32,11 @@ export default function Inventory() {
   });
 
   // Requisition Form
+  const [projects, setProjects] = useState([]);
   const [reqForm, setReqForm] = useState({
     materialName: '',
-    projectId: 'PRJ-101',
-    projectName: 'Skyline Heights',
+    projectId: '',
+    projectName: '',
     quantity: '',
     unit: 'bag',
     requiredByDate: '',
@@ -44,15 +45,17 @@ export default function Inventory() {
 
   const loadData = async () => {
     try {
-      const [mRes, tRes, rRes] = await Promise.all([
+      const [mRes, tRes, rRes, pRes] = await Promise.all([
         api.getMaterials(),
         api.getInventoryTransactions(),
-        api.getMaterialRequests()
+        api.getMaterialRequests(),
+        api.getProjects()
       ]);
 
       if (mRes.success) setMaterials(mRes.data);
       if (tRes.success) setTransactions(tRes.data);
       if (rRes.success) setMaterialRequests(rRes.data);
+      if (pRes.success) setProjects(pRes.data || []);
     } catch {
       showToast('Error loading inventory transactions', 'danger');
     } finally {
@@ -164,8 +167,8 @@ export default function Inventory() {
   const handleOpenNewRequest = (matName = '', unit = 'bag') => {
     setReqForm({
       materialName: matName,
-      projectId: 'PRJ-101',
-      projectName: 'Skyline Heights',
+      projectId: projects[0]?.projectId || projects[0]?.id || '',
+      projectName: projects[0]?.name || '',
       quantity: '100',
       unit: unit,
       requiredByDate: new Date(Date.now() + 5 * 86400000).toISOString().split('T')[0],
@@ -436,7 +439,7 @@ export default function Inventory() {
                           {txn.type === 'IN' ? '+' : txn.type === 'OUT' ? '-' : ''}{txn.quantity} {txn.unit}
                         </strong>
                       </td>
-                      <td>{txn.project || txn.projectName || 'Skyline Heights'}</td>
+                      <td>{txn.project || txn.projectName || '—'}</td>
                       <td>{txn.balanceAfter} {txn.unit}</td>
                       <td><span className="badge badge-neutral" style={{ fontSize: '0.75rem' }}>{txn.reference || 'N/A'}</span></td>
                       <td>{txn.performedBy || 'System User'}</td>
@@ -738,6 +741,26 @@ export default function Inventory() {
                 onChange={(e) => setReqForm({ ...reqForm, unit: e.target.value })}
               />
             </div>
+          </div>
+
+          <div className="form-group" style={{ marginBottom: '1rem' }}>
+            <label className="form-label">Destination Site</label>
+            <select
+              className="form-control"
+              value={reqForm.projectId}
+              onChange={(e) => {
+                const p = projects.find((x) => (x.projectId || x.id) === e.target.value);
+                setReqForm({
+                  ...reqForm,
+                  projectId: e.target.value,
+                  projectName: p ? p.name : ''
+                });
+              }}
+            >
+              {projects.map((p) => (
+                <option key={p.id || p._id} value={p.projectId || p.id}>{p.name}</option>
+              ))}
+            </select>
           </div>
 
           <div className="form-group" style={{ marginBottom: '1rem' }}>

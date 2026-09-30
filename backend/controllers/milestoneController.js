@@ -1,5 +1,6 @@
 import Milestone from '../models/Milestone.js';
 import Project from '../models/Project.js';
+import { getNextSequence } from '../models/Counter.js';
 
 export async function getMilestones(req, res, next) {
   try {
@@ -59,8 +60,15 @@ export async function createMilestone(req, res, next) {
       });
     }
 
+    if (!projectId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Project ID is required for milestone creation',
+      });
+    }
+
     let projectObjId = null;
-    let projId = projectId || 'PRJ-101';
+    let projId = projectId;
     if (projId) {
       const foundProject = await Project.findOne({
         $or: [{ projectId: projId }, ...(projId.match(/^[0-9a-fA-F]{24}$/) ? [{ _id: projId }] : [])],
@@ -71,8 +79,12 @@ export async function createMilestone(req, res, next) {
       }
     }
 
-    const count = await Milestone.countDocuments();
-    const milestoneId = `MLS-${101 + count}`;
+    let seq = await getNextSequence('milestone');
+    let milestoneId = `MLS-${String(seq + 100).padStart(3, '0')}`;
+    while (await Milestone.exists({ milestoneId })) {
+      seq = await getNextSequence('milestone');
+      milestoneId = `MLS-${String(seq + 100).padStart(3, '0')}`;
+    }
 
     const milestone = await Milestone.create({
       milestoneId,
@@ -103,7 +115,7 @@ export async function updateMilestone(req, res, next) {
     const query = isObjectId ? { _id: id } : { milestoneId: id };
 
     const milestone = await Milestone.findOneAndUpdate(query, req.body, {
-      new: true,
+      returnDocument: 'after',
       runValidators: true,
     });
 

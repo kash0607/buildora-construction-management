@@ -88,6 +88,17 @@ const taskSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
+    siteReport: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'SiteReport',
+      default: null,
+    },
+    relatedIssues: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Issue',
+      },
+    ],
   },
   {
     timestamps: true,

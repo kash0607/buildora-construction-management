@@ -2,6 +2,7 @@ import Material from '../models/Material.js';
 import InventoryTransaction from '../models/InventoryTransaction.js';
 import MaterialRequest from '../models/MaterialRequest.js';
 import { calculateStockStatus, validateStockIssue } from './businessRules.js';
+import { getNextSequence } from '../models/Counter.js';
 
 export class InventoryService {
   /**
@@ -25,8 +26,14 @@ export class InventoryService {
     material.status = calculateStockStatus(material.currentStock, material.reorderLevel);
     await material.save();
 
-    const count = await InventoryTransaction.countDocuments();
-    const transactionId = 'TXN-' + String(1001 + count);
+    let candidateTxnId;
+    let exists = true;
+    while (exists) {
+      const seq = await getNextSequence('inventoryTransaction');
+      candidateTxnId = `TXN-${String(seq + 1000).padStart(4, '0')}`;
+      exists = await InventoryTransaction.exists({ transactionId: candidateTxnId });
+    }
+    const transactionId = candidateTxnId;
 
     const transaction = new InventoryTransaction({
       transactionId,
@@ -74,8 +81,14 @@ export class InventoryService {
     material.status = calculateStockStatus(material.currentStock, material.reorderLevel);
     await material.save();
 
-    const count = await InventoryTransaction.countDocuments();
-    const transactionId = 'TXN-' + String(1001 + count);
+    let candidateTxnId;
+    let exists = true;
+    while (exists) {
+      const seq = await getNextSequence('inventoryTransaction');
+      candidateTxnId = `TXN-${String(seq + 1000).padStart(4, '0')}`;
+      exists = await InventoryTransaction.exists({ transactionId: candidateTxnId });
+    }
+    const transactionId = candidateTxnId;
 
     const transaction = new InventoryTransaction({
       transactionId,
@@ -124,8 +137,14 @@ export class InventoryService {
     material.status = calculateStockStatus(material.currentStock, material.reorderLevel);
     await material.save();
 
-    const count = await InventoryTransaction.countDocuments();
-    const transactionId = 'TXN-' + String(1001 + count);
+    let candidateTxnId;
+    let exists = true;
+    while (exists) {
+      const seq = await getNextSequence('inventoryTransaction');
+      candidateTxnId = `TXN-${String(seq + 1000).padStart(4, '0')}`;
+      exists = await InventoryTransaction.exists({ transactionId: candidateTxnId });
+    }
+    const transactionId = candidateTxnId;
 
     const transaction = new InventoryTransaction({
       transactionId,
@@ -203,8 +222,14 @@ export class InventoryService {
    * Create a material request
    */
   async createMaterialRequest(data, user) {
-    const count = await MaterialRequest.countDocuments();
-    const requestId = 'MRQ-' + String(501 + count);
+    let candidateReqId;
+    let exists = true;
+    while (exists) {
+      const seq = await getNextSequence('materialRequest');
+      candidateReqId = `MRQ-${String(seq + 500).padStart(3, '0')}`;
+      exists = await MaterialRequest.exists({ requestId: candidateReqId });
+    }
+    const requestId = candidateReqId;
 
     const request = new MaterialRequest({
       requestId,

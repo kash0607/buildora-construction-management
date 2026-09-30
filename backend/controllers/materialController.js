@@ -1,6 +1,7 @@
 import Material from '../models/Material.js';
 import { inventoryService } from '../services/inventoryService.js';
 import { calculateStockStatus } from '../services/businessRules.js';
+import { getNextSequence } from '../models/Counter.js';
 
 /**
  * @desc    Get all materials with filters
@@ -70,8 +71,12 @@ export async function createMaterial(req, res, next) {
       });
     }
 
-    const count = await Material.countDocuments();
-    const materialId = 'MAT-' + String(101 + count);
+    let seq = await getNextSequence('material');
+    let materialId = `MAT-${String(seq + 100).padStart(3, '0')}`;
+    while (await Material.exists({ materialId })) {
+      seq = await getNextSequence('material');
+      materialId = `MAT-${String(seq + 100).padStart(3, '0')}`;
+    }
     const stock = Number(currentStock) || 0;
     const reorder = Number(reorderLevel) || 10;
     const status = calculateStockStatus(stock, reorder);
@@ -82,8 +87,8 @@ export async function createMaterial(req, res, next) {
       category: category || 'Structural & Civil',
       unit: unit || 'bag',
       description: description || '',
-      projectId: projectId || 'PRJ-101',
-      projectName: projectName || 'General Store',
+      projectId: projectId || '',
+      projectName: projectName || '',
       currentStock: stock,
       minimumStock: Number(minimumStock) || 0,
       reorderLevel: reorder,

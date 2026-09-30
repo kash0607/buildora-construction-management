@@ -56,6 +56,16 @@ const issueSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
+    siteReport: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'SiteReport',
+      default: null,
+    },
+    task: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Task',
+      default: null,
+    },
   },
   {
     timestamps: true,

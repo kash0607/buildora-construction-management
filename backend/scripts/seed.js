@@ -81,6 +81,13 @@ async function seedDatabase() {
         role: 'Client',
         phone: '+91 98765 43215',
       },
+      {
+        name: 'Sunil Mehta',
+        email: 'vendor@apexsteel.com',
+        password: 'Password123!',
+        role: 'Vendor',
+        phone: '+91 98765 43216',
+      },
     ]);
 
     const pm = users[0];

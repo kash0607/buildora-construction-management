@@ -33,8 +33,9 @@ export function setAuthToken(token) {
  */
 async function request(endpoint, options = {}) {
   const token = getAuthToken();
+  const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
   const headers = {
-    'Content-Type': 'application/json',
+    ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
     ...(options.headers || {}),
   };
 
@@ -117,6 +118,11 @@ class BuildoraAPIService {
     return await request('/auth/me', { method: 'GET' });
   }
 
+  async getUsers(role = null) {
+    const q = role && role !== 'All' ? `?role=${encodeURIComponent(role)}` : '';
+    return await request(`/auth/users${q}`, { method: 'GET' });
+  }
+
   logout() {
     setAuthToken(null);
     try {
@@ -166,13 +172,16 @@ class BuildoraAPIService {
       name: projectData.name,
       client: projectData.client || 'Client Developer',
       location: projectData.location || 'Site Location, India',
-      manager: projectData.manager || (currentUser ? currentUser.name : 'Kashish Patel'),
+      manager: projectData.manager || (currentUser ? currentUser.name : 'Project Manager'),
       budget: budgetNum,
       status: projectData.status === 'On Hold' ? 'Planning' : (projectData.status || 'Planning'),
       startDate: projectData.startDate || new Date().toISOString().split('T')[0],
       deadline: projectData.deadline || '2028-12-31',
       description: projectData.description || '',
       image: projectData.image || 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?auto=format&fit=crop&w=800&q=80',
+      managerUser: projectData.managerUser || undefined,
+      clientUser: projectData.clientUser || undefined,
+      assignedUsers: projectData.assignedUsers || undefined,
     };
 
     return await request('/projects', {
@@ -281,9 +290,9 @@ class BuildoraAPIService {
     const payload = {
       title: taskData.title,
       description: taskData.description || '',
-      project: taskData.projectId || taskData.project || 'PRJ-101',
-      projectId: taskData.projectId || 'PRJ-101',
-      assignee: taskData.assignee || 'Sanjay Verma',
+      project: taskData.projectId || taskData.project || '',
+      projectId: taskData.projectId || taskData.project || '',
+      assignee: taskData.assignee || (currentUser ? currentUser.name : 'Unassigned'),
       priority: taskData.priority || 'Medium',
       status: taskData.status === 'Not Started' ? 'To Do' : (taskData.status || 'To Do'),
       startDate: taskData.startDate || today,
@@ -369,7 +378,7 @@ class BuildoraAPIService {
       category: materialData.category || 'Structural & Civil',
       unit: materialData.unit || 'bag',
       description: materialData.description || '',
-      projectId: materialData.projectId || 'PRJ-101',
+      projectId: materialData.projectId || materialData.project || '',
       projectName: materialData.projectName || materialData.project || 'General Store',
       currentStock: Number(materialData.currentStock) || 0,
       minimumStock: Number(materialData.minimumStock) || 0,
@@ -486,7 +495,7 @@ class BuildoraAPIService {
   async createMaterialRequest(reqData, currentUser) {
     const payload = {
       materialName: reqData.materialName,
-      projectId: reqData.projectId || 'PRJ-101',
+      projectId: reqData.projectId || reqData.project || '',
       projectName: reqData.projectName || 'Site Operation',
       quantity: Number(reqData.quantity) || 1,
       unit: reqData.unit || 'units',
@@ -592,12 +601,12 @@ class BuildoraAPIService {
     return res;
   }
 
-  async createMilestone(milestoneData) {
+  async createMilestone(milestoneData, currentUser) {
     const payload = {
       title: milestoneData.title,
       dueDate: milestoneData.dueDate,
-      responsible: milestoneData.responsible || 'Kashish Patel',
-      projectId: milestoneData.projectId || 'PRJ-101',
+      responsible: milestoneData.responsible || (currentUser ? currentUser.name : 'Project Manager'),
+      projectId: milestoneData.projectId || milestoneData.project || '',
       progress: parseInt(milestoneData.progress, 10) || 0,
       status: milestoneData.status || 'Upcoming',
       description: milestoneData.description || '',
@@ -673,7 +682,7 @@ class BuildoraAPIService {
       title: issueData.title,
       project: issueData.project,
       priority: issueData.priority || 'Medium',
-      assignee: issueData.assignee || (currentUser ? currentUser.name : 'Sanjay Verma'),
+      assignee: issueData.assignee || (currentUser ? currentUser.name : 'Unassigned'),
       description: issueData.description || '',
     };
 
@@ -740,7 +749,294 @@ class BuildoraAPIService {
       body: JSON.stringify(payload),
     });
   }
+  // ==========================================
+  // 9. PROCUREMENT & VENDORS
+  // ==========================================
+  async getVendors(filters = {}) {
+    const params = new URLSearchParams();
+    if (filters.status && filters.status !== 'All') params.append('status', filters.status);
+    if (filters.search) params.append('search', filters.search);
+    const q = params.toString() ? `?${params.toString()}` : '';
+    return await request(`/procurement/vendors${q}`, { method: 'GET' });
+  }
+
+  async getVendor(id) {
+    return await request(`/procurement/vendors/${id}`, { method: 'GET' });
+  }
+
+  async createVendor(data) {
+    return await request('/procurement/vendors', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateVendor(id, data) {
+    return await request(`/procurement/vendors/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteVendor(id) {
+    return await request(`/procurement/vendors/${id}`, { method: 'DELETE' });
+  }
+
+  async getProcurementRequests(filters = {}) {
+    const params = new URLSearchParams();
+    if (filters.status && filters.status !== 'All') params.append('status', filters.status);
+    if (filters.project && filters.project !== 'All') params.append('project', filters.project);
+    const q = params.toString() ? `?${params.toString()}` : '';
+    return await request(`/procurement/requests${q}`, { method: 'GET' });
+  }
+
+  async createProcurementRequest(data) {
+    return await request('/procurement/requests', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateProcurementRequestStatus(id, status, notes = '') {
+    return await request(`/procurement/requests/${id}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status, notes }),
+    });
+  }
+
+  async getPurchaseOrders(filters = {}) {
+    const params = new URLSearchParams();
+    if (filters.status && filters.status !== 'All') params.append('status', filters.status);
+    if (filters.project && filters.project !== 'All') params.append('project', filters.project);
+    if (filters.vendor && filters.vendor !== 'All') params.append('vendor', filters.vendor);
+    const q = params.toString() ? `?${params.toString()}` : '';
+    return await request(`/procurement/orders${q}`, { method: 'GET' });
+  }
+
+  async getPurchaseOrder(id) {
+    return await request(`/procurement/orders/${id}`, { method: 'GET' });
+  }
+
+  async createPurchaseOrder(data) {
+    return await request('/procurement/orders', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updatePurchaseOrderStatus(id, status, notes = '') {
+    return await request(`/procurement/orders/${id}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status, notes }),
+    });
+  }
+
+  async getDeliveries(filters = {}) {
+    const params = new URLSearchParams();
+    if (filters.poNumber) params.append('poNumber', filters.poNumber);
+    if (filters.project && filters.project !== 'All') params.append('project', filters.project);
+    const q = params.toString() ? `?${params.toString()}` : '';
+    return await request(`/procurement/deliveries${q}`, { method: 'GET' });
+  }
+
+  async createDelivery(data) {
+    return await request('/procurement/deliveries', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  // ==========================================
+  // 10. FINANCE (Expenses, Invoices, Payments, Budget)
+  // ==========================================
+  async getExpenses(filters = {}) {
+    const params = new URLSearchParams();
+    if (filters.project && filters.project !== 'All') params.append('project', filters.project);
+    if (filters.category && filters.category !== 'All') params.append('category', filters.category);
+    if (filters.status && filters.status !== 'All') params.append('status', filters.status);
+    const q = params.toString() ? `?${params.toString()}` : '';
+    return await request(`/finance/expenses${q}`, { method: 'GET' });
+  }
+
+  async createExpense(data) {
+    return await request('/finance/expenses', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateExpenseStatus(id, status) {
+    return await request(`/finance/expenses/${id}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status }),
+    });
+  }
+
+  async getInvoices(filters = {}) {
+    const params = new URLSearchParams();
+    if (filters.project && filters.project !== 'All') params.append('project', filters.project);
+    if (filters.status && filters.status !== 'All') params.append('status', filters.status);
+    const q = params.toString() ? `?${params.toString()}` : '';
+    return await request(`/finance/invoices${q}`, { method: 'GET' });
+  }
+
+  async createInvoice(data) {
+    return await request('/finance/invoices', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async getPayments(filters = {}) {
+    const params = new URLSearchParams();
+    if (filters.invoiceId) params.append('invoiceId', filters.invoiceId);
+    if (filters.project && filters.project !== 'All') params.append('project', filters.project);
+    const q = params.toString() ? `?${params.toString()}` : '';
+    return await request(`/finance/payments${q}`, { method: 'GET' });
+  }
+
+  async recordPayment(data) {
+    return await request('/finance/payments', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async getBudgetUtilization(projectId = null) {
+    const q = projectId && projectId !== 'All' ? `?projectId=${encodeURIComponent(projectId)}` : '';
+    return await request(`/finance/budget-utilization${q}`, { method: 'GET' });
+  }
+
+  // ==========================================
+  // 11. DOCUMENTS
+  // ==========================================
+  async getDocuments(filters = {}) {
+    const params = new URLSearchParams();
+    if (filters.project && filters.project !== 'All') params.append('project', filters.project);
+    if (filters.category && filters.category !== 'All') params.append('category', filters.category);
+    if (filters.visibility && filters.visibility !== 'All') params.append('visibility', filters.visibility);
+    if (filters.search) params.append('search', filters.search);
+    const q = params.toString() ? `?${params.toString()}` : '';
+    return await request(`/documents${q}`, { method: 'GET' });
+  }
+
+  async uploadDocument(data) {
+    const isFormData = typeof FormData !== 'undefined' && data instanceof FormData;
+    return await request('/documents', {
+      method: 'POST',
+      body: isFormData ? data : JSON.stringify(data),
+    });
+  }
+
+  async downloadDocument(id, fileName = 'document.pdf') {
+    const token = getAuthToken();
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const cleanId = String(id).replace(/^\//, '');
+    const res = await fetch(`${API_BASE_URL}/documents/${cleanId}/download`, { headers });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ message: 'Download failed' }));
+      return { success: false, message: err.message || 'Download failed' };
+    }
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+    return { success: true };
+  }
+
+  async updateDocumentVisibility(id, visibility) {
+    return await request(`/documents/${id}/visibility`, {
+      method: 'PUT',
+      body: JSON.stringify({ visibility }),
+    });
+  }
+
+  async deleteDocument(id) {
+    return await request(`/documents/${id}`, { method: 'DELETE' });
+  }
+
+  // ==========================================
+  // 12. CLIENT PORTAL & SITE PHOTOS
+  // ==========================================
+  async getClientProjects() {
+    return await request('/client/projects', { method: 'GET' });
+  }
+
+  async getClientProjectDetails(id) {
+    return await request(`/client/projects/${id}`, { method: 'GET' });
+  }
+
+  async uploadSitePhoto(reportId, photoData) {
+    const isFormData = typeof FormData !== 'undefined' && photoData instanceof FormData;
+    return await request(`/site-reports/${reportId}/photos`, {
+      method: 'POST',
+      body: isFormData ? photoData : JSON.stringify(photoData),
+    });
+  }
+
+  async downloadSitePhoto(reportId, photoId, fileName = 'site-photo.jpg') {
+    const token = getAuthToken();
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const res = await fetch(`${API_BASE_URL}/site-reports/${reportId}/photos/${photoId}/download`, { headers });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ message: 'Photo download failed' }));
+      return { success: false, message: err.message || 'Photo download failed' };
+    }
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+    return { success: true };
+  }
+
+  async approveSitePhoto(reportId, photoId) {
+    return await request(`/site-reports/${reportId}/photos/${photoId}/approve`, {
+      method: 'PUT',
+    });
+  }
+
+  async getClientApprovedPhotos(projectId = null) {
+    const q = projectId && projectId !== 'All' ? `?project=${encodeURIComponent(projectId)}` : '';
+    return await request(`/site-reports/photos/client-approved${q}`, { method: 'GET' });
+  }
+
+  // ==========================================
+  // 13. NOTIFICATIONS & AUDIT LOGS
+  // ==========================================
+  async getNotifications() {
+    return await request('/notifications', { method: 'GET' });
+  }
+
+  async markNotificationRead(id) {
+    return await request(`/notifications/${id}/read`, { method: 'PUT' });
+  }
+
+  async markAllNotificationsRead() {
+    return await request('/notifications/read-all', { method: 'PUT' });
+  }
+
+  async getAuditLogs(filters = {}) {
+    const params = new URLSearchParams();
+    if (filters.entity && filters.entity !== 'All') params.append('entity', filters.entity);
+    if (filters.action && filters.action !== 'All') params.append('action', filters.action);
+    if (filters.search) params.append('search', filters.search);
+    const q = params.toString() ? `?${params.toString()}` : '';
+    return await request(`/audit-logs${q}`, { method: 'GET' });
+  }
 }
 
 export const api = new BuildoraAPIService();
 export default api;
+

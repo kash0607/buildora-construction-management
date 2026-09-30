@@ -27,9 +27,9 @@ export default function TaskForm({
   const initialForm = {
     title: '',
     description: '',
-    projectId: projects[0]?.id || 'PRJ-101',
-    project: projects[0]?.name || 'Skyline Heights',
-    assignee: 'Sanjay Verma',
+    projectId: projects[0]?.id || projects[0]?.projectId || '',
+    project: projects[0]?.name || '',
+    assignee: '',
     priority: 'Medium',
     status: 'To Do',
     startDate: todayStr,
@@ -46,9 +46,9 @@ export default function TaskForm({
       setFormData({
         title: editingTask.title || '',
         description: editingTask.description || '',
-        projectId: editingTask.projectId || projects[0]?.id || 'PRJ-101',
-        project: editingTask.project || projects[0]?.name || 'Skyline Heights',
-        assignee: editingTask.assignee || 'Sanjay Verma',
+        projectId: editingTask.projectId || projects[0]?.id || projects[0]?.projectId || '',
+        project: editingTask.project || projects[0]?.name || '',
+        assignee: editingTask.assignee || '',
         priority: editingTask.priority || 'Medium',
         status: editingTask.status === 'Not Started' ? 'To Do' : (editingTask.status || 'To Do'),
         startDate: editingTask.startDate || todayStr,
@@ -59,8 +59,8 @@ export default function TaskForm({
     } else {
       setFormData({
         ...initialForm,
-        projectId: projects[0]?.id || 'PRJ-101',
-        project: projects[0]?.name || 'Skyline Heights'
+        projectId: projects[0]?.id || projects[0]?.projectId || '',
+        project: projects[0]?.name || ''
       });
     }
     setErrors({});
@@ -223,7 +223,7 @@ export default function TaskForm({
                   id="task-assignee-input"
                   type="text"
                   className="form-control"
-                  placeholder="e.g. Sanjay Verma"
+                  placeholder="e.g. Site Supervisor / Engineer"
                   value={formData.assignee}
                   onChange={(e) => setFormData({ ...formData, assignee: e.target.value })}
                 />

@@ -147,7 +147,7 @@ export default function Register() {
                   id="reg-fullname"
                   name="fullName"
                   className={`form-control ${errors.fullName ? 'is-invalid' : ''}`}
-                  placeholder="e.g. Kashish Patel"
+                  placeholder="e.g. John Doe"
                   value={formData.fullName}
                   onChange={handleChange}
                   required
@@ -168,12 +168,7 @@ export default function Register() {
                   required
                 >
                   <option value="Project Manager">Project Manager</option>
-                  <option value="Admin">Admin</option>
                   <option value="Site Supervisor">Site Supervisor</option>
-                  <option value="Procurement Manager">Procurement Manager</option>
-                  <option value="Finance">Finance</option>
-                  <option value="Client">Client Representative</option>
-                  <option value="Vendor">Vendor / Contractor</option>
                 </select>
               </div>
             </div>

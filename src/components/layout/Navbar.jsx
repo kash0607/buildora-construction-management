@@ -4,18 +4,12 @@ import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 
 export default function Navbar({ onToggleSidebar, onOpenCreateProject, onOpenQuickReport, onOpenQuickPO }) {
-  const { currentUser, roles, switchRole, logout } = useAuth();
+  const { currentUser, logout } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-
-  const handleRoleChange = (e) => {
-    const newRole = e.target.value;
-    switchRole(newRole);
-    showToast(`Switched active workspace persona to ${newRole}`, 'info');
-  };
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -49,21 +43,7 @@ export default function Navbar({ onToggleSidebar, onOpenCreateProject, onOpenQui
       </div>
 
       <div className="navbar-right">
-        {/* Role Persona Switcher Pill */}
-        <div className="role-switcher-wrapper">
-          <span className="role-switcher-label">Persona:</span>
-          <select
-            className="role-switcher-select"
-            value={currentUser?.role || 'Project Manager'}
-            onChange={handleRoleChange}
-          >
-            {roles.map((r) => (
-              <option key={r.id} value={r.name}>
-                {r.name}
-              </option>
-            ))}
-          </select>
-        </div>
+
 
         {/* Notifications Icon Button */}
         <div style={{ position: 'relative' }}>
@@ -104,12 +84,12 @@ export default function Navbar({ onToggleSidebar, onOpenCreateProject, onOpenQui
               <div className="card-body" style={{ padding: '0.5rem 1rem', maxHeight: '260px', overflowY: 'auto' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
                   <div style={{ fontSize: '0.8rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--color-border-subtle)' }}>
-                    <div className="font-semibold text-dark">5 Urgent Purchase Requests</div>
-                    <div className="text-muted" style={{ fontSize: '0.72rem' }}>Rebar & Cement POs awaiting sign-off</div>
+                    <div className="font-semibold text-dark">Pending Purchase Requests</div>
+                    <div className="text-muted" style={{ fontSize: '0.72rem' }}>Material POs awaiting sign-off</div>
                   </div>
                   <div style={{ fontSize: '0.8rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--color-border-subtle)' }}>
-                    <div className="font-semibold text-dark">Slab Casting Completed</div>
-                    <div className="text-muted" style={{ fontSize: '0.72rem' }}>Skyline Heights 18th Floor report submitted</div>
+                    <div className="font-semibold text-dark">View all notifications →</div>
+                    <div className="text-muted" style={{ fontSize: '0.72rem' }}>Check the Notifications page for details</div>
                   </div>
                 </div>
               </div>
@@ -124,10 +104,12 @@ export default function Navbar({ onToggleSidebar, onOpenCreateProject, onOpenQui
             onClick={() => setShowUserMenu(!showUserMenu)}
             style={{ cursor: 'pointer' }}
           >
-            <div className="nav-avatar">{currentUser?.avatar || 'KP'}</div>
+            <div className="nav-avatar">
+              {currentUser?.avatar || (currentUser?.name ? currentUser.name.split(' ').map((n) => n[0]).join('').substring(0, 2).toUpperCase() : 'U')}
+            </div>
             <div className="nav-user-text">
-              <span className="nav-user-name">{currentUser?.name || 'Kashish Patel'}</span>
-              <span className="nav-user-role">{currentUser?.role || 'Project Manager'}</span>
+              <span className="nav-user-name">{currentUser?.name || 'User'}</span>
+              <span className="nav-user-role">{currentUser?.role || 'Team Member'}</span>
             </div>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"/></svg>
           </div>

@@ -9,23 +9,36 @@ export default function Issues() {
   const { currentUser } = useAuth();
   const { showToast } = useToast();
   const [issues, setIssues] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [priorityFilter, setPriorityFilter] = useState('All');
 
   const [newIssue, setNewIssue] = useState({
     title: '',
-    project: 'Skyline Heights',
+    project: '',
     priority: 'Medium',
-    assignee: 'Sanjay Verma',
+    assignee: currentUser?.name || '',
     description: ''
   });
 
   const loadIssues = async () => {
     try {
-      const res = await api.getIssues();
-      if (res.success) {
-        setIssues(res.data);
+      const [iRes, pRes] = await Promise.all([
+        api.getIssues(),
+        api.getProjects()
+      ]);
+      if (iRes.success) {
+        setIssues(iRes.data);
+      }
+      if (pRes.success && pRes.data) {
+        setProjects(pRes.data);
+        if (pRes.data.length > 0) {
+          setNewIssue((prev) => ({
+            ...prev,
+            project: prev.project || pRes.data[0].name
+          }));
+        }
       }
     } catch {
       showToast('Error loading issues', 'danger');
@@ -47,9 +60,9 @@ export default function Issues() {
       showToast('Issue logged in QA tracker!', 'success');
       setNewIssue({
         title: '',
-        project: 'Skyline Heights',
+        project: projects[0]?.name || '',
         priority: 'Medium',
-        assignee: 'Sanjay Verma',
+        assignee: currentUser?.name || '',
         description: ''
       });
       setIsCreateOpen(false);
@@ -172,11 +185,11 @@ export default function Issues() {
                   value={newIssue.project}
                   onChange={(e) => setNewIssue({ ...newIssue, project: e.target.value })}
                 >
-                  <option value="Skyline Heights">Skyline Heights Luxury Towers</option>
-                  <option value="Metro Commercial Complex">Metro Commercial Complex</option>
-                  <option value="Green Valley Residency">Green Valley Residency</option>
-                  <option value="Riverside Villas & Club">Riverside Villas & Club</option>
-                  <option value="Horizon Tech Park - Tower C">Horizon Tech Park - Tower C</option>
+                  {projects.map((p) => (
+                    <option key={p.id || p._id} value={p.name}>
+                      {p.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 

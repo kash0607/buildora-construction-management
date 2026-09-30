@@ -10,6 +10,8 @@ export async function protect(req, res, next) {
   const authHeader = req.headers.authorization;
   if (authHeader && authHeader.startsWith('Bearer ')) {
     token = authHeader.split(' ')[1];
+  } else if (req.query && req.query.token) {
+    token = req.query.token;
   }
 
   if (!token) {
@@ -20,7 +22,11 @@ export async function protect(req, res, next) {
   }
 
   try {
-    const secret = process.env.JWT_SECRET || 'buildora_default_jwt_secret_key_2026';
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      console.error('❌ FATAL: JWT_SECRET environment variable is not set.');
+      return res.status(500).json({ success: false, message: 'Server authentication misconfiguration' });
+    }
     const decoded = jwt.verify(token, secret);
 
     const user = await User.findById(decoded.id).select('-password');
@@ -76,7 +82,10 @@ export function authorizeRoles(...roles) {
  * Helper to generate JWT token for a user
  */
 export function generateToken(user) {
-  const secret = process.env.JWT_SECRET || 'buildora_default_jwt_secret_key_2026';
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_SECRET environment variable is not set. Cannot generate tokens.');
+  }
   const expiresIn = process.env.JWT_EXPIRES_IN || '1d';
   return jwt.sign(
     {

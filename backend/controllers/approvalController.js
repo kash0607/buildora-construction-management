@@ -1,5 +1,9 @@
 import Approval from '../models/Approval.js';
 import Project from '../models/Project.js';
+import PurchaseRequest from '../models/PurchaseRequest.js';
+import { getNextSequence } from '../models/Counter.js';
+import { sendNotification } from '../services/notificationService.js';
+import { logAudit } from '../services/auditService.js';
 
 export async function getAllApprovals(req, res, next) {
   try {
@@ -47,20 +51,38 @@ export async function createApproval(req, res, next) {
   try {
     const { project, category, title, estimatedValue, amount, vendor, priority, type } = req.body;
 
-    const pName = project || 'Skyline Heights';
-    let projId = 'PRJ-101';
-    let projectRef = null;
-
-    const foundProject = await Project.findOne({
-      $or: [{ name: pName }, { projectId: project }],
-    });
-    if (foundProject) {
-      projId = foundProject.projectId;
-      projectRef = foundProject._id;
+    if (!project) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed: Project is required for approval requests',
+      });
     }
 
-    const count = await Approval.countDocuments();
-    const approvalId = `APP-${401 + count}`;
+    let projDoc = null;
+    if (project) {
+      projDoc = (project.startsWith('PRJ-') || !project.match(/^[0-9a-fA-F]{24}$/))
+        ? await Project.findOne({ projectId: project })
+        : await Project.findById(project);
+      if (!projDoc) {
+        projDoc = await Project.findOne({ name: new RegExp(`^${project}$`, 'i') });
+      }
+    }
+
+    if (!projDoc) {
+      return res.status(400).json({
+        success: false,
+        message: `Project '${project}' not found`,
+      });
+    }
+
+    let candidateAppId;
+    let exists = true;
+    while (exists) {
+      const seq = await getNextSequence('approval');
+      candidateAppId = `APP-${String(seq + 400).padStart(3, '0')}`;
+      exists = await Approval.exists({ approvalId: candidateAppId });
+    }
+    const approvalId = candidateAppId;
     const requestedBy = req.user
       ? `${req.user.name} (${req.user.role})`
       : (req.body.requestedBy || 'Site Supervisor');
@@ -69,15 +91,36 @@ export async function createApproval(req, res, next) {
       approvalId,
       type: type || 'Purchase Request',
       title: title || category || 'Material Requisition',
-      project: projectRef,
-      projectId: projId,
-      projectName: foundProject ? foundProject.name : pName,
+      project: projDoc._id,
+      projectId: projDoc.projectId,
+      projectName: projDoc.name,
       requestedBy,
-      amount: amount || estimatedValue || '₹5,00,000',
+      amount: amount || estimatedValue || '₹0',
       vendor: vendor || 'Pending Vendor Bid',
       priority: priority || 'Normal',
       status: 'Pending',
       createdBy: req.user?._id,
+    });
+
+    await sendNotification({
+      targetRole: 'Project Manager',
+      project: projDoc._id,
+      title: 'New Approval Request',
+      message: `${approval.title} (${approval.approvalId}) requires review.`,
+      type: 'Approval',
+      link: '/approvals',
+    });
+
+    await logAudit({
+      user: req.user?._id,
+      userName: req.user?.name || 'System',
+      userRole: req.user?.role || 'System',
+      action: 'CREATE',
+      entity: 'Approval',
+      entityId: approval.approvalId,
+      project: projDoc._id,
+      projectId: projDoc.projectId,
+      details: { title: approval.title, amount: approval.amount },
     });
 
     return res.status(201).json({
@@ -114,7 +157,7 @@ export async function handleApprovalAction(req, res, next) {
         reviewedAt: new Date(),
         reviewNotes: notes || '',
       },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
     if (!approval) {
@@ -123,6 +166,35 @@ export async function handleApprovalAction(req, res, next) {
         message: `Approval request '${id}' not found`,
       });
     }
+
+    // Sync with linked Purchase Request
+    if (approval.purchaseRequest) {
+      await PurchaseRequest.findByIdAndUpdate(approval.purchaseRequest, {
+        status: newStatus,
+      });
+    }
+
+    // Dispatch notification
+    await sendNotification({
+      recipient: approval.createdBy,
+      project: approval.project,
+      title: `Approval Request ${newStatus}`,
+      message: `Your approval request ${approval.approvalId} was ${newStatus.toLowerCase()}.`,
+      type: 'Approval',
+      link: '/approvals',
+    });
+
+    await logAudit({
+      user: req.user?._id,
+      userName: req.user?.name || 'System',
+      userRole: req.user?.role || 'System',
+      action: action.toUpperCase(),
+      entity: 'Approval',
+      entityId: approval.approvalId,
+      project: approval.project,
+      projectId: approval.projectId,
+      details: { status: newStatus, notes },
+    });
 
     return res.status(200).json({
       success: true,

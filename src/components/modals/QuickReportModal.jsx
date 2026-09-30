@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from '../common/Modal';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
@@ -8,14 +8,35 @@ export default function QuickReportModal({ isOpen, onClose, onReportSubmitted })
   const { currentUser } = useAuth();
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [projects, setProjects] = useState([]);
+  const [photoFile, setPhotoFile] = useState(null);
 
   const [formData, setFormData] = useState({
-    project: 'Skyline Heights',
-    workersPresent: 142,
-    weather: 'Clear, 32°C',
+    project: '',
+    workersPresent: 50,
+    weather: 'Clear, 28°C',
     workCompleted: '',
     issues: ''
   });
+
+  useEffect(() => {
+    if (isOpen) {
+      const loadProjects = async () => {
+        try {
+          const res = await api.getProjects();
+          if (res.success && res.data?.length > 0) {
+            setProjects(res.data);
+            if (!formData.project) {
+              setFormData((prev) => ({ ...prev, project: res.data[0].name }));
+            }
+          }
+        } catch {
+          // ignore
+        }
+      };
+      loadProjects();
+    }
+  }, [isOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -28,14 +49,28 @@ export default function QuickReportModal({ isOpen, onClose, onReportSubmitted })
     try {
       const res = await api.createSiteReport(formData, currentUser);
       if (res.success) {
+        // If a photo was selected, upload it
+        if (photoFile && res.data) {
+          try {
+            const reportId = res.data.reportId || res.data._id || res.data.id;
+            const photoData = new FormData();
+            photoData.append('photo', photoFile);
+            photoData.append('caption', `Field progress photo for ${formData.project}`);
+            await api.uploadSitePhoto(reportId, photoData);
+          } catch {
+            // non-fatal
+          }
+        }
+
         showToast('Site report logged and synced to cloud!', 'success');
         setFormData({
-          project: 'Skyline Heights',
-          workersPresent: 142,
-          weather: 'Clear, 32°C',
+          project: projects[0]?.name || '',
+          workersPresent: 50,
+          weather: 'Clear, 28°C',
           workCompleted: '',
           issues: ''
         });
+        setPhotoFile(null);
         if (onReportSubmitted) onReportSubmitted(res.data);
         onClose();
       }
@@ -62,11 +97,11 @@ export default function QuickReportModal({ isOpen, onClose, onReportSubmitted })
               onChange={handleChange}
               required
             >
-              <option value="Skyline Heights">Skyline Heights Luxury Towers</option>
-              <option value="Metro Commercial Complex">Metro Commercial Complex</option>
-              <option value="Green Valley Residency">Green Valley Residency</option>
-              <option value="Riverside Villas & Club">Riverside Villas & Club</option>
-              <option value="Horizon Tech Park - Tower C">Horizon Tech Park - Tower C</option>
+              {projects.map((p) => (
+                <option key={p.id || p._id} value={p.name}>
+                  {p.name} ({p.projectId || p.id})
+                </option>
+              ))}
             </select>
           </div>
 
@@ -130,6 +165,24 @@ export default function QuickReportModal({ isOpen, onClose, onReportSubmitted })
               value={formData.issues}
               onChange={handleChange}
             />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="qr-photo">
+              Attach Site Progress Photo (Optional)
+            </label>
+            <input
+              type="file"
+              id="qr-photo"
+              className="form-control"
+              accept="image/*"
+              onChange={(e) => setPhotoFile(e.target.files?.[0] || null)}
+            />
+            {photoFile && (
+              <div style={{ fontSize: '0.8rem', color: 'var(--color-success)', marginTop: '0.3rem' }}>
+                📷 {photoFile.name} ({(photoFile.size / 1024).toFixed(0)} KB)
+              </div>
+            )}
           </div>
         </div>
 

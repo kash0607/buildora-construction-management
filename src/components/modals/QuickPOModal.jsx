@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from '../common/Modal';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
@@ -8,14 +8,34 @@ export default function QuickPOModal({ isOpen, onClose, onPOSubmitted }) {
   const { currentUser } = useAuth();
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [projects, setProjects] = useState([]);
 
   const [formData, setFormData] = useState({
-    project: 'Skyline Heights',
+    project: '',
     category: 'Structural Steel (TMT Rebars)',
-    estimatedValue: '₹15,00,000',
-    vendor: 'Tata Steel Structurals Ltd.',
+    estimatedValue: '',
+    vendor: '',
     priority: 'Normal'
   });
+
+  // Fetch real projects from backend
+  useEffect(() => {
+    if (isOpen) {
+      (async () => {
+        try {
+          const res = await api.getProjects(currentUser);
+          if (res.success && Array.isArray(res.data)) {
+            setProjects(res.data);
+            if (res.data.length > 0 && !formData.project) {
+              setFormData((prev) => ({ ...prev, project: res.data[0].projectId || res.data[0].name }));
+            }
+          }
+        } catch {
+          // Projects will remain empty; form will show placeholder
+        }
+      })();
+    }
+  }, [isOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,16 +44,20 @@ export default function QuickPOModal({ isOpen, onClose, onPOSubmitted }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.project) {
+      showToast('Please select a project', 'warning');
+      return;
+    }
     setLoading(true);
     try {
       const res = await api.createPurchaseRequest(formData, currentUser);
       if (res.success) {
         showToast('Purchase request routed to Finance & PM approval queue.', 'success');
         setFormData({
-          project: 'Skyline Heights',
+          project: formData.project,
           category: 'Structural Steel (TMT Rebars)',
-          estimatedValue: '₹15,00,000',
-          vendor: 'Tata Steel Structurals Ltd.',
+          estimatedValue: '',
+          vendor: '',
           priority: 'Normal'
         });
         if (onPOSubmitted) onPOSubmitted(res.data);
@@ -62,11 +86,15 @@ export default function QuickPOModal({ isOpen, onClose, onPOSubmitted }) {
               onChange={handleChange}
               required
             >
-              <option value="Skyline Heights">Skyline Heights Luxury Towers</option>
-              <option value="Metro Commercial Complex">Metro Commercial Complex</option>
-              <option value="Green Valley Residency">Green Valley Residency</option>
-              <option value="Riverside Villas & Club">Riverside Villas & Club</option>
-              <option value="Horizon Tech Park - Tower C">Horizon Tech Park - Tower C</option>
+              {projects.length === 0 ? (
+                <option value="">No projects available</option>
+              ) : (
+                projects.map((p) => (
+                  <option key={p._id || p.projectId} value={p.projectId || p.name}>
+                    {p.name} ({p.projectId})
+                  </option>
+                ))
+              )}
             </select>
           </div>
 
@@ -146,7 +174,7 @@ export default function QuickPOModal({ isOpen, onClose, onPOSubmitted }) {
           <button type="button" className="btn btn-outline" onClick={onClose} disabled={loading}>
             Cancel
           </button>
-          <button type="submit" className="btn btn-primary" disabled={loading}>
+          <button type="submit" className="btn btn-primary" disabled={loading || projects.length === 0}>
             {loading ? 'Submitting...' : 'Submit for Approval'}
           </button>
         </div>

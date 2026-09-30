@@ -11,6 +11,7 @@
     "server:dev": "node --watch backend/server.js",
     "test:backend": "node --test backend/tests/*.test.js",
     "test:e2e": "node backend/scripts/verify_e2e.js",
+    "test:live": "node backend/scripts/verify_database_live.js",
     "seed": "node backend/scripts/seed.js"
   },
   "dependencies": {
@@ -27,6 +28,7 @@
     "lenis": "^1.3.26",
     "lucide-react": "^0.475.0",
     "mongoose": "^9.10.0",
+    "multer": "^2.4.0",
     "react": "^19.0.0",
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.0.0",

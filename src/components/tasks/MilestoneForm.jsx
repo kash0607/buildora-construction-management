@@ -19,12 +19,12 @@ export default function MilestoneForm({
   const initialForm = {
     title: '',
     description: '',
-    projectId: projects[0]?.id || 'PRJ-101',
-    project: projects[0]?.name || 'Skyline Heights',
+    projectId: projects[0]?.id || projects[0]?.projectId || '',
+    project: projects[0]?.name || '',
     dueDate: defaultDueStr,
     status: 'Upcoming',
     progress: 0,
-    responsible: 'Kashish Patel',
+    responsible: '',
     relatedTaskIds: []
   };
 
@@ -36,19 +36,19 @@ export default function MilestoneForm({
       setFormData({
         title: editingMilestone.title || '',
         description: editingMilestone.description || '',
-        projectId: editingMilestone.projectId || projects[0]?.id || 'PRJ-101',
-        project: editingMilestone.project || projects[0]?.name || 'Skyline Heights',
+        projectId: editingMilestone.projectId || projects[0]?.id || projects[0]?.projectId || '',
+        project: editingMilestone.project || projects[0]?.name || '',
         dueDate: editingMilestone.dueDate || defaultDueStr,
         status: editingMilestone.status || 'Upcoming',
         progress: editingMilestone.progress !== undefined ? editingMilestone.progress : 0,
-        responsible: editingMilestone.responsible || 'Kashish Patel',
+        responsible: editingMilestone.responsible || '',
         relatedTaskIds: editingMilestone.relatedTaskIds || []
       });
     } else {
       setFormData({
         ...initialForm,
-        projectId: projects[0]?.id || 'PRJ-101',
-        project: projects[0]?.name || 'Skyline Heights'
+        projectId: projects[0]?.id || projects[0]?.projectId || '',
+        project: projects[0]?.name || ''
       });
     }
     setErrors({});

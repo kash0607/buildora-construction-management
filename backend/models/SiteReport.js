@@ -55,10 +55,34 @@ const siteReportSchema = new mongoose.Schema(
       default: 'Submitted',
       index: true,
     },
+    relatedTasks: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Task',
+      },
+    ],
+    relatedIssues: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Issue',
+      },
+    ],
     date: {
       type: String,
       default: () => 'Today, ' + new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
     },
+    photos: [
+      {
+        url: { type: String, required: true },
+        caption: { type: String, default: '' },
+        uploadedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        uploadedByName: { type: String, default: '' },
+        timestamp: { type: Date, default: Date.now },
+        clientApproved: { type: Boolean, default: false },
+        approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+        approvedAt: { type: Date, default: null },
+      },
+    ],
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',

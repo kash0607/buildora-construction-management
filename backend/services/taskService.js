@@ -1,5 +1,6 @@
 import Task from '../models/Task.js';
 import Project from '../models/Project.js';
+import { getNextSequence } from '../models/Counter.js';
 import {
   validateDependencies,
   canCompleteTask,
@@ -99,8 +100,12 @@ export class TaskService {
     }
 
     // Generate unique taskId
-    const count = await Task.countDocuments();
-    const taskId = 'TSK-' + String(101 + count);
+    let seq = await getNextSequence('task');
+    let taskId = 'TSK-' + String(100 + seq);
+    while (await Task.exists({ taskId })) {
+      seq = await getNextSequence('task');
+      taskId = 'TSK-' + String(100 + seq);
+    }
 
     // Validate date logic
     if (taskData.startDate && taskData.dueDate) {
@@ -128,7 +133,7 @@ export class TaskService {
       ...taskData,
       taskId,
       project: projectDoc._id,
-      projectId: projectDoc.projectId || 'PRJ-101',
+      projectId: projectDoc.projectId || '',
       projectName: projectDoc.name,
       createdBy: userId,
     });

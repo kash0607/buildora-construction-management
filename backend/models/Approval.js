@@ -83,6 +83,15 @@ const approvalSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
+    purchaseRequest: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'PurchaseRequest',
+      default: null,
+    },
+    purchaseRequestId: {
+      type: String,
+      default: null,
+    },
   },
   {
     timestamps: true,

@@ -7,7 +7,7 @@ import EditProjectModal from '../components/modals/EditProjectModal';
 
 export default function ProjectDetails() {
   const { id } = useParams();
-  const projectId = id || 'PRJ-101';
+  const projectId = id;
   const { showToast } = useToast();
 
   const [project, setProject] = useState(null);
@@ -20,6 +20,10 @@ export default function ProjectDetails() {
   const [isEditOpen, setIsEditOpen] = useState(false);
 
   const loadProjectData = async () => {
+    if (!projectId) {
+      setLoading(false);
+      return;
+    }
     try {
       const [pRes, tRes, iRes, rRes, mRes] = await Promise.all([
         api.getProject(projectId),

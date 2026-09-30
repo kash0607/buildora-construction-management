@@ -115,6 +115,23 @@ const projectSchema = new mongoose.Schema(
       min: 0,
     },
     team: [teamMemberSchema],
+    // ── User-relationship fields for data scoping ──
+    managerUser: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      index: true,
+    },
+    clientUser: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      index: true,
+    },
+    assignedUsers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+      },
+    ],
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',

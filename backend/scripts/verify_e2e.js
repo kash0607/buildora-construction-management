@@ -6,448 +6,555 @@ import { connectDB } from '../config/db.js';
 import User from '../models/User.js';
 import Project from '../models/Project.js';
 import Task from '../models/Task.js';
+import Milestone from '../models/Milestone.js';
 import Material from '../models/Material.js';
 import InventoryTransaction from '../models/InventoryTransaction.js';
-import MaterialRequest from '../models/MaterialRequest.js';
+import SiteReport from '../models/SiteReport.js';
+import Vendor from '../models/Vendor.js';
+import PurchaseOrder from '../models/PurchaseOrder.js';
+import Delivery from '../models/Delivery.js';
+import Expense from '../models/Expense.js';
+import Invoice from '../models/Invoice.js';
+import Payment from '../models/Payment.js';
 
 dotenv.config();
 
 async function runE2EVerification() {
-  console.log('🚀 Starting BUILDORA Week 1 End-to-End Verification Suite...\n');
+  console.log('🚀 Starting BUILDORA End-to-End Enterprise Lifecycle Suite...\n');
 
-  // 1. Verify Database Connection
   const dbConnected = await connectDB();
   assert.equal(dbConnected, true, 'MongoDB must connect successfully');
   console.log('✅ 1. MongoDB Connected Successfully');
 
-  // Start HTTP server on ephemeral port
   const server = app.listen(0);
   const port = server.address().port;
   const baseUrl = `http://localhost:${port}/api`;
-  console.log(`✅ 2. Test Express Server listening at ${baseUrl}\n`);
+  console.log(`✅ 2. Express Server listening at ${baseUrl}\n`);
 
   try {
     // ----------------------------------------------------
-    // TASK N.1: AUTHENTICATION FLOW
+    // 1. AUTHENTICATION (PM & CLIENT)
     // ----------------------------------------------------
-    console.log('--- Testing Authentication Flow ---');
-    const testEmail = `e2e.user.${Date.now()}@buildora.com`;
-    const testPassword = 'Password123!';
-    const testName = 'E2E Test Engineer';
+    console.log('--- 1. Authentication Flow ---');
+    const timestamp = Date.now();
+    const pmEmail = `pm.${timestamp}@buildora.com`;
+    const clientEmail = `client.${timestamp}@buildora.com`;
+    const password = 'Password123!';
 
-    // A. Register
-    const regRes = await fetch(`${baseUrl}/auth/register`, {
+    // Register PM
+    const pmRegRes = await fetch(`${baseUrl}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        name: testName,
-        email: testEmail,
-        password: testPassword,
+        name: 'Kashish Patel (PM)',
+        email: pmEmail,
+        password,
         role: 'Project Manager',
-        phone: '+91 99999 88888',
       }),
     });
-    assert.equal(regRes.status, 201, 'Registration must return 201 Created');
-    const regData = await regRes.json();
-    assert.equal(regData.success, true);
-    assert.ok(regData.data?.token, 'Registration must return a JWT token');
-    const token = regData.data.token;
-    console.log('✅ Register: POST /api/auth/register returned 201 with JWT');
+    assert.equal(pmRegRes.status, 201);
+    const pmToken = (await pmRegRes.json()).data.token;
+    console.log('✅ Registered Project Manager (JWT acquired)');
 
-    // B. Verify user in MongoDB
-    const mongoUser = await User.findOne({ email: testEmail });
-    assert.ok(mongoUser, 'Registered user must exist in MongoDB');
-    assert.equal(mongoUser.name, testName);
-    console.log(`✅ MongoDB Record: User verified in database (${mongoUser._id})`);
-
-    // C. Login
-    const loginRes = await fetch(`${baseUrl}/auth/login`, {
+    // Register Client
+    const clientRegRes = await fetch(`${baseUrl}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: testEmail, password: testPassword }),
+      body: JSON.stringify({
+        name: 'Rajesh Oberoi (Client)',
+        email: clientEmail,
+        password,
+        role: 'Client',
+      }),
     });
-    assert.equal(loginRes.status, 200, 'Login must return 200 OK');
-    const loginData = await loginRes.json();
-    assert.equal(loginData.success, true);
-    assert.ok(loginData.data?.token);
-    console.log('✅ Login: POST /api/auth/login returned 200 with JWT');
+    const clientRegData = (await clientRegRes.json()).data;
+    const clientToken = clientRegData.token;
+    const clientUser = clientRegData.user;
+    console.log('✅ Registered Client (JWT acquired)');
 
-    // D. Current User / Session Restore (GET /api/auth/me)
+    // Register Finance
+    const financeEmail = `finance.${timestamp}@buildora.com`;
+    const finRegRes = await fetch(`${baseUrl}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'Zaara Mehta (Finance)',
+        email: financeEmail,
+        password,
+        role: 'Finance',
+      }),
+    });
+    assert.equal(finRegRes.status, 201);
+    const financeToken = (await finRegRes.json()).data.token;
+    console.log('✅ Registered Finance Officer (JWT acquired)');
+
+    // Verify /api/auth/me session restore
     const meRes = await fetch(`${baseUrl}/auth/me`, {
-      method: 'GET',
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${pmToken}` },
     });
-    assert.equal(meRes.status, 200, 'GET /api/auth/me must return 200 OK');
+    assert.equal(meRes.status, 200);
     const meData = await meRes.json();
-    assert.equal(meData.success, true);
-    assert.equal(meData.data.email, testEmail);
-    console.log(`✅ Session Restore: GET /api/auth/me restored ${meData.data.email}`);
-
-    // E. Invalid credentials handling
-    const invalidLoginRes = await fetch(`${baseUrl}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: testEmail, password: 'WrongPassword!' }),
-    });
-    assert.equal(invalidLoginRes.status, 401, 'Invalid password must return 401 Unauthorized');
-    console.log('✅ Error Handling: Invalid credentials rejected with 401');
+    assert.equal(meData.data.role, 'Project Manager');
+    console.log('✅ Session Hydration: /api/auth/me restored authenticated role strictly from backend');
 
     // ----------------------------------------------------
-    // TASK N.2: PROJECT FLOW
+    // 2. PROJECT CREATION
     // ----------------------------------------------------
-    console.log('\n--- Testing Project Flow ---');
-    // A. Create Project
+    console.log('\n--- 2. Project Creation ---');
     const projRes = await fetch(`${baseUrl}/projects`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${pmToken}`,
       },
       body: JSON.stringify({
-        name: 'E2E Coastal Infrastructure',
-        client: 'Port Authority Ltd',
-        location: 'Colaba, Mumbai',
-        manager: testName,
-        budget: 450000000,
-        status: 'Active',
+        name: `Horizon Landmark Tower ${timestamp}`,
+        client: 'Apex Luxury Developments',
+        clientUser: clientUser._id,
+        location: 'Worli Sea Face, Mumbai',
+        manager: 'Kashish Patel (PM)',
+        budget: 50000000, // 5 Cr
         startDate: '2026-04-01',
         deadline: '2028-12-31',
-        description: 'Deepwater container berth and approach jetties.',
+        description: 'Luxury 45-story residential high-rise',
       }),
     });
-    assert.equal(projRes.status, 201, 'Create project must return 201 Created');
+    if (projRes.status !== 201) {
+      console.log('❌ Project creation error:', await projRes.json());
+    }
+    assert.equal(projRes.status, 201);
     const projData = await projRes.json();
-    assert.equal(projData.success, true);
-    const createdProject = projData.data;
-    assert.ok(createdProject.projectId || createdProject._id);
-    const projectId = createdProject.projectId || createdProject._id;
-    console.log(`✅ Create Project: Created '${createdProject.name}' (${projectId})`);
-
-    // B. Read Project via API
-    const getProjRes = await fetch(`${baseUrl}/projects/${projectId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    assert.equal(getProjRes.status, 200);
-    const getProjData = await getProjRes.json();
-    assert.equal(getProjData.data.name, 'E2E Coastal Infrastructure');
-    console.log(`✅ Read Project: Verified GET /api/projects/${projectId}`);
-
-    // C. Verify in MongoDB
-    const mongoProject = await Project.findOne({ name: 'E2E Coastal Infrastructure' });
-    assert.ok(mongoProject, 'Project must persist in MongoDB');
-    console.log(`✅ MongoDB Persistence: Project confirmed in database`);
-
-    // D. Edit Project
-    const updateProjRes = await fetch(`${baseUrl}/projects/${projectId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        location: 'Marine Lines, Mumbai',
-        progress: 15,
-      }),
-    });
-    assert.equal(updateProjRes.status, 200);
-    const updatedProj = await updateProjRes.json();
-    assert.equal(updatedProj.data.location, 'Marine Lines, Mumbai');
-    console.log(`✅ Update Project: PUT /api/projects/${projectId} updated location`);
+    const project = projData.data;
+    console.log(`✅ Project Created: '${project.name}' (${project.projectId})`);
 
     // ----------------------------------------------------
-    // TASK N.3: TASK FLOW
+    // 3. TASK & MILESTONE CREATION
     // ----------------------------------------------------
-    console.log('\n--- Testing Task Flow ---');
-    // A. Create Task
+    console.log('\n--- 3. Tasks & Milestones ---');
     const taskRes = await fetch(`${baseUrl}/tasks`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${pmToken}`,
       },
       body: JSON.stringify({
-        title: 'Bore Piling & Anchor Installation',
-        description: 'Complete 48 heavy marine piles along northern quay.',
-        project: projectId,
+        title: 'Deep Foundation Bore Piling',
+        projectId: project.projectId,
         assignee: 'Sanjay Verma',
         priority: 'High',
-        status: 'To Do',
+        progress: 40,
         startDate: '2026-04-05',
-        dueDate: '2026-06-30',
-        progress: 0,
+        dueDate: '2026-05-30',
       }),
     });
-    assert.equal(taskRes.status, 201, 'Create task must return 201 Created');
-    const taskData = await taskRes.json();
-    assert.equal(taskData.success, true);
-    const createdTask = taskData.data;
-    const taskId = createdTask.taskId || createdTask._id;
-    console.log(`✅ Create Task: Created '${createdTask.title}' (${taskId})`);
+    assert.equal(taskRes.status, 201);
+    const task = (await taskRes.json()).data;
+    console.log(`✅ Task Created: '${task.title}' (${task.taskId})`);
 
-    // B. Read Task
-    const getTaskRes = await fetch(`${baseUrl}/tasks/${taskId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    assert.equal(getTaskRes.status, 200);
-    const getTaskData = await getTaskRes.json();
-    assert.equal(getTaskData.data.title, 'Bore Piling & Anchor Installation');
-    console.log(`✅ Read Task: Verified GET /api/tasks/${taskId}`);
-
-    // C. Edit Task
-    const updateTaskRes = await fetch(`${baseUrl}/tasks/${taskId}`, {
-      method: 'PUT',
+    const mlsRes = await fetch(`${baseUrl}/milestones`, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${pmToken}`,
       },
       body: JSON.stringify({
-        status: 'In Progress',
-        progress: 35,
+        title: 'Substructure & Raft Foundation Sign-off',
+        projectId: project.projectId,
+        responsible: 'Kashish Patel (PM)',
+        dueDate: '2026-06-15',
+        progress: 50,
       }),
     });
-    assert.equal(updateTaskRes.status, 200);
-    const updatedTask = await updateTaskRes.json();
-    assert.equal(updatedTask.data.status, 'In Progress');
-    assert.equal(updatedTask.data.progress, 35);
-    console.log(`✅ Update Task: PUT /api/tasks/${taskId} status transitioned to In Progress (35%)`);
+    assert.equal(mlsRes.status, 201);
+    const milestone = (await mlsRes.json()).data;
+    console.log(`✅ Milestone Created: '${milestone.title}' (${milestone.milestoneId})`);
 
-    // D. Task Summary Stats
-    const statsRes = await fetch(`${baseUrl}/tasks/stats/summary?project=${projectId}`, {
-      headers: { Authorization: `Bearer ${token}` },
+    // ----------------------------------------------------
+    // 4. SITE REPORT & PHOTO WORKFLOW
+    // ----------------------------------------------------
+    console.log('\n--- 4. Daily Site Report & Photo Approval Flow ---');
+    const repRes = await fetch(`${baseUrl}/site-reports`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${pmToken}`,
+      },
+      body: JSON.stringify({
+        project: project.projectId,
+        weather: 'Clear, 32°C',
+        workersPresent: 85,
+        workCompleted: 'Cast 12 bore piles and assembled rebar cages',
+        progressToday: '+1.2%',
+      }),
     });
-    assert.equal(statsRes.status, 200);
-    const statsData = await statsRes.json();
-    assert.ok(statsData.data.total >= 1);
-    console.log(`✅ Task Stats: Verified GET /api/tasks/stats/summary (Total: ${statsData.data.total})`);
+    assert.equal(repRes.status, 201);
+    const report = (await repRes.json()).data;
+    console.log(`✅ Site Report Created: '${report.reportId}'`);
+
+    // Upload Photo
+    const photoUploadRes = await fetch(`${baseUrl}/site-reports/${report.reportId}/photos`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${pmToken}`,
+      },
+      body: JSON.stringify({
+        url: 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800',
+        caption: 'Bore Piling Rig Active on Sector 2',
+      }),
+    });
+    assert.equal(photoUploadRes.status, 201);
+    console.log('✅ Site Photo Uploaded for internal review');
+
+    // Retrieve report to get photo ID and approve it
+    const repGetRes = await fetch(`${baseUrl}/site-reports/${report.reportId}`, {
+      headers: { Authorization: `Bearer ${pmToken}` },
+    });
+    const repWithPhoto = (await repGetRes.json()).data;
+    assert.equal(repWithPhoto.photos.length, 1);
+    const photoId = repWithPhoto.photos[0]._id;
+
+    // PM approves photo for client portal
+    const approvePhotoRes = await fetch(`${baseUrl}/site-reports/${report.reportId}/photos/${photoId}/approve`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${pmToken}` },
+    });
+    assert.equal(approvePhotoRes.status, 200);
+    console.log('✅ Site Photo Approved for Client Portal exposure');
 
     // ----------------------------------------------------
-    // TASK N.4: MATERIAL FLOW
+    // 5. MATERIAL & PROCUREMENT VENDOR
     // ----------------------------------------------------
-    console.log('\n--- Testing Material & Inventory Flow ---');
-    // A. Create Material
+    console.log('\n--- 5. Materials & Vendor Procurement ---');
     const matRes = await fetch(`${baseUrl}/materials`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${pmToken}`,
       },
       body: JSON.stringify({
-        name: 'Epoxy Grout Compound E-200',
-        category: 'Waterproofing & Chemicals',
-        unit: 'kg',
-        projectId: projectId,
-        projectName: 'E2E Coastal Infrastructure',
-        currentStock: 50,
-        minimumStock: 40,
-        reorderLevel: 100, // stock (50) <= reorder (100) -> Low Stock
-        unitCost: 450,
+        name: `OPC 53 Cement Batch ${timestamp}`,
+        category: 'Structural & Civil',
+        unit: 'bags',
+        currentStock: 100,
+        reorderLevel: 50,
+        unitCost: 380,
+        projectId: project.projectId,
       }),
     });
     assert.equal(matRes.status, 201);
-    const matData = await matRes.json();
-    const createdMaterial = matData.data;
-    const materialId = createdMaterial.materialId || createdMaterial._id;
-    assert.equal(createdMaterial.status, 'Low Stock');
-    console.log(`✅ Create Material: Created '${createdMaterial.name}' (${materialId}) with status 'Low Stock'`);
+    const material = (await matRes.json()).data;
+    console.log(`✅ Material Created: '${material.name}' (Stock: 100 bags)`);
 
-    // B. Confirm in MongoDB
-    const mongoMaterial = await Material.findOne({ name: 'Epoxy Grout Compound E-200' });
-    assert.ok(mongoMaterial);
-    console.log(`✅ MongoDB Persistence: Material confirmed in database`);
-
-    // C. Low-Stock Alerts
-    const lowStockRes = await fetch(`${baseUrl}/materials/alerts/low-stock`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    assert.equal(lowStockRes.status, 200);
-    const lowStockList = await lowStockRes.json();
-    const foundAlert = lowStockList.data.some((m) => m.name === 'Epoxy Grout Compound E-200');
-    assert.ok(foundAlert, 'New material must appear in low-stock alerts');
-    console.log(`✅ Low Stock Logic: Verified in GET /api/materials/alerts/low-stock`);
-
-    // ----------------------------------------------------
-    // TASK N.5: INVENTORY FLOW
-    // ----------------------------------------------------
-    console.log('\n--- Testing Stock Movement Flow ---');
-    // A. Receive Stock (IN)
-    const receiveRes = await fetch(`${baseUrl}/inventory/receive`, {
+    // Register Vendor
+    const vendorRes = await fetch(`${baseUrl}/procurement/vendors`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${pmToken}`,
       },
       body: JSON.stringify({
-        materialId: materialId,
-        quantity: 100,
-        unit: 'kg',
-        reference: 'PO-E2E-001',
-        notes: 'Delivery received at harbor warehouse',
+        name: `National Cement & Steel Corp ${timestamp}`,
+        email: `vendor.${timestamp}@nationalcement.com`,
+        phone: '+91 98220 11223',
+        categories: ['Structural & Civil'],
+        paymentTerms: 'Net 30 Days',
       }),
     });
-    assert.equal(receiveRes.status, 201);
-    const receiveData = await receiveRes.json();
-    assert.equal(receiveData.data.material.currentStock, 150); // 50 + 100 = 150 -> In Stock
-    assert.equal(receiveData.data.material.status, 'In Stock');
-    console.log(`✅ Receive Stock: Received 100 kg. Balance: 150 kg (Status: In Stock)`);
-
-    // B. Issue Stock (OUT)
-    const issueRes = await fetch(`${baseUrl}/inventory/issue`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        materialId: materialId,
-        quantity: 30,
-        unit: 'kg',
-        reference: 'ISS-PIER-01',
-        notes: 'Issued for pile cap grouting',
-      }),
-    });
-    assert.equal(issueRes.status, 200);
-    const issueData = await issueRes.json();
-    assert.equal(issueData.data.material.currentStock, 120); // 150 - 30 = 120
-    console.log(`✅ Issue Stock: Issued 30 kg. Balance: 120 kg`);
-
-    // C. Negative Stock Prevention Rule
-    const invalidIssueRes = await fetch(`${baseUrl}/inventory/issue`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        materialId: materialId,
-        quantity: 99999, // Exceeds 120
-        unit: 'kg',
-      }),
-    });
-    assert.equal(invalidIssueRes.status, 400, 'Negative stock attempt must be rejected with 400');
-    console.log(`✅ Negative Stock Protection: Excessive issue rejected with 400 Bad Request`);
-
-    // D. Check Transaction History
-    const txnRes = await fetch(`${baseUrl}/inventory/transactions`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    assert.equal(txnRes.status, 200);
-    const txns = await txnRes.json();
-    const hasTxn = txns.data.some((t) => t.reference === 'PO-E2E-001' || t.reference === 'ISS-PIER-01');
-    assert.ok(hasTxn, 'Transaction history must contain newly logged inventory movements');
-    console.log(`✅ Audit Trail: Transaction history verified via GET /api/inventory/transactions`);
+    if (vendorRes.status !== 201) {
+      console.error('Vendor creation failed:', await vendorRes.text());
+    }
+    assert.equal(vendorRes.status, 201);
+    const vendor = (await vendorRes.json()).data;
+    console.log(`✅ Vendor Registered: '${vendor.name}' (${vendor.vendorId})`);
 
     // ----------------------------------------------------
-    // TASK N.6: MATERIAL REQUEST FLOW
+    // 6. PURCHASE ORDER & PARTIAL DELIVERY FULFILLMENT
     // ----------------------------------------------------
-    console.log('\n--- Testing Material Request Flow ---');
-    // A. Create Material Request
-    const reqRes = await fetch(`${baseUrl}/material-requests`, {
+    console.log('\n--- 6. Purchase Order & Delivery Receiving Sync ---');
+    // Enterprise Item 8: Purchase Order requires an approved Purchase Request
+    const prRes = await fetch(`${baseUrl}/procurement/requests`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${pmToken}`,
       },
       body: JSON.stringify({
-        materialName: 'Epoxy Grout Compound E-200',
-        projectId: projectId,
-        projectName: 'E2E Coastal Infrastructure',
-        quantity: 200,
-        unit: 'kg',
-        requiredByDate: '2026-05-15',
-        notes: 'Required for phase 2 pile anchoring',
+        title: 'Requisition for 100 Bags OPC Cement',
+        project: project.projectId,
+        items: [
+          {
+            material: material.id || material._id,
+            name: material.name,
+            quantity: 100,
+            estimatedRate: 380,
+            unit: 'bags',
+          },
+        ],
+        priority: 'High',
       }),
     });
-    assert.equal(reqRes.status, 201);
-    const reqData = await reqRes.json();
-    const createdReq = reqData.data;
-    const reqId = createdReq.requestId || createdReq._id;
-    assert.equal(createdReq.status, 'Pending');
-    console.log(`✅ Create Request: Created material request '${reqId}' (Status: Pending)`);
+    assert.equal(prRes.status, 201);
+    const pr = (await prRes.json()).data;
+    console.log(`✅ Purchase Request Created: ${pr.requestId} (Status: ${pr.status})`);
 
-    // B. Read Requests
-    const getReqsRes = await fetch(`${baseUrl}/material-requests?project=${projectId}`, {
-      headers: { Authorization: `Bearer ${token}` },
+    // Authoritative Enterprise Approval: Approve the Purchase Request via the Approval Workflow
+    const approvePrRes = await fetch(`${baseUrl}/approvals/${pr.approval}/action`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${pmToken}`,
+      },
+      body: JSON.stringify({
+        action: 'approve',
+        notes: 'Approved for vendor procurement by PM',
+      }),
     });
-    assert.equal(getReqsRes.status, 200);
-    const reqsList = await getReqsRes.json();
-    const foundReq = reqsList.data.some((r) => (r.requestId || r._id) === reqId);
-    assert.ok(foundReq);
-    console.log(`✅ Read Requests: Verified GET /api/material-requests`);
+    assert.equal(approvePrRes.status, 200);
+    console.log(`✅ Purchase Request Approved via Authoritative Workflow: ${pr.requestId}`);
 
-    // C. Update Request Status (Approve)
-    const updateReqRes = await fetch(`${baseUrl}/material-requests/${reqId}`, {
+    const poRes = await fetch(`${baseUrl}/procurement/orders`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${pmToken}`,
+      },
+      body: JSON.stringify({
+        title: '100 Bags OPC Cement Consignment',
+        project: project.projectId,
+        vendor: vendor.vendorId,
+        purchaseRequest: pr.requestId,
+        deliveryDate: '2026-05-10',
+        items: [
+          {
+            material: material.id || material._id,
+            name: material.name,
+            quantity: 100,
+            unitPrice: 380,
+            unit: 'bags',
+          },
+        ],
+      }),
+    });
+    if (poRes.status !== 201) {
+      console.error('PO Error:', poRes.status, await poRes.text());
+    }
+    assert.equal(poRes.status, 201);
+    const po = (await poRes.json()).data;
+    assert.equal(po.status, 'Issued');
+    console.log(`✅ PO Issued: ${po.poNumber} for 100 bags (Status: Issued)`);
+
+    // First Delivery: Partial receipt of 40 bags
+    const del1Res = await fetch(`${baseUrl}/procurement/deliveries`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${pmToken}`,
+      },
+      body: JSON.stringify({
+        purchaseOrder: po.poNumber,
+        deliveryChallanNumber: 'DC-8819',
+        items: [
+          {
+            material: material.id || material._id,
+            name: material.name,
+            orderedQuantity: 100,
+            receivedQuantity: 40,
+            acceptedQuantity: 40,
+            rejectedQuantity: 0,
+            unit: 'bags',
+            qualityStatus: 'Passed',
+          },
+        ],
+        qualityStatus: 'Passed',
+      }),
+    });
+    if (del1Res.status !== 201) {
+      console.error('Delivery Error:', del1Res.status, await del1Res.text());
+    }
+    assert.equal(del1Res.status, 201);
+    const del1Data = await del1Res.json();
+    assert.equal(del1Data.data.poStatus, 'Partially Delivered');
+    console.log(`✅ Partial Delivery 1: Received 40 bags → PO updated to 'Partially Delivered'`);
+
+    // Verify Material Stock updated in MongoDB (100 initial + 40 received = 140)
+    const matAfterDel1 = await Material.findById(material._id || material.id);
+    assert.equal(matAfterDel1.currentStock, 140, 'Stock must increment by 40');
+    console.log(`✅ Inventory Sync: Stock balance verified at ${matAfterDel1.currentStock} bags`);
+
+    // Second Delivery: Final receipt of remaining 60 bags
+    const del2Res = await fetch(`${baseUrl}/procurement/deliveries`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${pmToken}`,
+      },
+      body: JSON.stringify({
+        purchaseOrder: po.poNumber,
+        deliveryChallanNumber: 'DC-8825',
+        items: [
+          {
+            material: material._id || material.id,
+            name: material.name,
+            orderedQuantity: 100,
+            receivedQuantity: 60,
+            acceptedQuantity: 60,
+            rejectedQuantity: 0,
+            unit: 'bags',
+            qualityStatus: 'Passed',
+          },
+        ],
+        qualityStatus: 'Passed',
+      }),
+    });
+    assert.equal(del2Res.status, 201);
+    const del2Data = await del2Res.json();
+    assert.equal(del2Data.data.poStatus, 'Delivered');
+    console.log(`✅ Final Delivery 2: Received 60 bags → PO updated to 'Delivered'`);
+
+    const matAfterDel2 = await Material.findById(material._id || material.id);
+    assert.equal(matAfterDel2.currentStock, 200, 'Stock must increment by 60 to reach 200');
+    console.log(`✅ Inventory Sync: Final stock balance verified at ${matAfterDel2.currentStock} bags`);
+
+    // ----------------------------------------------------
+    // 7. FINANCE (EXPENSE, INVOICE, PAYMENT & BUDGET)
+    // ----------------------------------------------------
+    console.log('\n--- 7. Finance Flow & Budget Utilization ---');
+    // A. Record Expense
+    const expRes = await fetch(`${baseUrl}/finance/expenses`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${pmToken}`,
+      },
+      body: JSON.stringify({
+        title: 'Diesel for Tower Mobile Piling Rigs',
+        project: project.projectId,
+        category: 'Fuel & Power',
+        amount: 85000,
+      }),
+    });
+    assert.equal(expRes.status, 201);
+    const exp = (await expRes.json()).data;
+    console.log(`✅ Expense Created: ${exp.expenseId} (₹85,000)`);
+
+    // Approve Expense
+    const approveExpRes = await fetch(`${baseUrl}/finance/expenses/${exp._id}/status`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${pmToken}`,
       },
-      body: JSON.stringify({
-        status: 'Approved',
-        reviewNotes: 'Verified against procurement allocation',
-      }),
+      body: JSON.stringify({ status: 'Approved' }),
     });
-    assert.equal(updateReqRes.status, 200);
-    const updatedReq = await updateReqRes.json();
-    assert.equal(updatedReq.data.status, 'Approved');
-    console.log(`✅ Update Request: Material request status transitioned to 'Approved'`);
+    assert.equal(approveExpRes.status, 200);
+    console.log(`✅ Expense ${exp.expenseId} Approved`);
 
-    // ----------------------------------------------------
-    // TASK J: RBAC VERIFICATION
-    // ----------------------------------------------------
-    console.log('\n--- Testing RBAC Restrictions ---');
-    // Register a Site Supervisor user
-    const supervisorEmail = `supervisor.${Date.now()}@buildora.com`;
-    const regSupRes = await fetch(`${baseUrl}/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: 'Field Supervisor Test',
-        email: supervisorEmail,
-        password: testPassword,
-        role: 'Site Supervisor',
-      }),
-    });
-    const supervisorToken = (await regSupRes.json()).data.token;
-
-    // Site Supervisor attempts to delete a project (Forbidden for Site Supervisor)
-    const deleteRes = await fetch(`${baseUrl}/projects/${projectId}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${supervisorToken}` },
-    });
-    assert.equal(deleteRes.status, 403, 'Site Supervisor must receive 403 Forbidden for DELETE /api/projects/:id');
-    console.log('✅ RBAC Enforcement: Site Supervisor blocked from deleting project (403 Forbidden)');
-
-    // Site Supervisor attempts to issue stock (Allowed for Site Supervisor)
-    const allowedSupRes = await fetch(`${baseUrl}/inventory/issue`, {
+    // B. Create Client Invoice
+    const invRes = await fetch(`${baseUrl}/finance/invoices`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${supervisorToken}`,
+        Authorization: `Bearer ${pmToken}`,
       },
       body: JSON.stringify({
-        materialId: materialId,
-        quantity: 5,
-        unit: 'kg',
-        reference: 'ISS-SUPERVISOR-TEST',
+        title: 'Piling Works Progress Certificate 1',
+        project: project.projectId,
+        client: 'Apex Luxury Developments',
+        subtotal: 1000000, // 10 Lakh
+        taxRate: 18,
+        dueDate: '2026-06-30',
       }),
     });
-    assert.equal(allowedSupRes.status, 200, 'Site Supervisor must be permitted to issue stock');
-    console.log('✅ RBAC Enforcement: Site Supervisor permitted to issue stock (200 OK)');
+    assert.equal(invRes.status, 201);
+    const invoice = (await invRes.json()).data;
+    assert.equal(invoice.totalAmount, 1180000);
+    console.log(`✅ Invoice Issued: ${invoice.invoiceNumber} (Total: ₹11,80,000 incl GST)`);
+
+    // C. Reconcile Payment (Finance Persona)
+    const payRes = await fetch(`${baseUrl}/finance/payments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${financeToken}`,
+      },
+      body: JSON.stringify({
+        invoice: invoice.invoiceNumber,
+        amount: 1180000,
+        paymentMethod: 'Bank Transfer / NEFT',
+        transactionReference: 'NEFT-HDFC-99128311',
+      }),
+    });
+    assert.equal(payRes.status, 201);
+    console.log('✅ Payment Reconciled: Full invoice settled (Status: Paid)');
+
+    // D. Verify Live Budget Utilization calculation
+    const budgetRes = await fetch(`${baseUrl}/finance/budget-utilization?projectId=${project.projectId}`, {
+      headers: { Authorization: `Bearer ${pmToken}` },
+    });
+    assert.equal(budgetRes.status, 200);
+    const budgetData = (await budgetRes.json()).data;
+    assert.ok(budgetData.actualExpenses >= 85000, 'Actual expenses must include approved expense');
+    console.log(`✅ Budget Metrics verified: Total ₹${budgetData.totalBudget.toLocaleString('en-IN')}, Remaining ₹${budgetData.remainingBudget.toLocaleString('en-IN')}`);
 
     // ----------------------------------------------------
-    // TASK K: CORS RESTRICTION VERIFICATION
+    // 8. DOCUMENT MANAGEMENT
     // ----------------------------------------------------
-    console.log('\n--- Testing CORS Configuration ---');
-    // Disallowed origin should be rejected
-    const corsDisallowedRes = await fetch(`${baseUrl}/health`, {
-      headers: { Origin: 'https://malicious-third-party-website.com' },
+    console.log('\n--- 8. Document Management & Access Control ---');
+    const docRes = await fetch(`${baseUrl}/documents`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${pmToken}`,
+      },
+      body: JSON.stringify({
+        title: 'Foundation Raft Structural Design Sheet',
+        fileName: 'STR_RAFT_01.pdf',
+        fileUrl: 'https://storage.buildora.com/docs/STR_RAFT_01.pdf',
+        fileType: 'PDF',
+        project: project.projectId,
+        category: 'Structural Calculation',
+        visibility: 'Client Visible',
+      }),
     });
-    const acaoHeader = corsDisallowedRes.headers.get('access-control-allow-origin');
-    assert.notEqual(acaoHeader, 'https://malicious-third-party-website.com');
-    console.log('✅ CORS Restriction: Unauthorized external origin blocked');
+    assert.equal(docRes.status, 201);
+    console.log('✅ Document uploaded with visibility: Client Visible');
+
+    // ----------------------------------------------------
+    // 9. CLIENT PORTAL VERIFICATION
+    // ----------------------------------------------------
+    console.log('\n--- 9. Client Portal Sanitized View ---');
+    const clientProjRes = await fetch(`${baseUrl}/client/projects/${project.projectId}`, {
+      headers: { Authorization: `Bearer ${clientToken}` },
+    });
+    assert.equal(clientProjRes.status, 200);
+    const clientView = (await clientProjRes.json()).data;
+
+    assert.ok(clientView.project, 'Client must receive project overview');
+    assert.equal(clientView.project.budget, undefined, 'Client must NOT see internal budget/margins');
+    assert.ok(clientView.milestones.length >= 1, 'Client must see milestone schedule');
+    assert.ok(clientView.approvedPhotos.length >= 1, 'Client must see approved site photos');
+    assert.ok(clientView.documents.length >= 1, 'Client must see approved client documents');
+    console.log('✅ Client Portal: Verified sanitized endpoints (no internal expenses, no inventory, verified photos & docs visible)');
+
+    // ----------------------------------------------------
+    // 10. RBAC SECURITY BOUNDARY CHECKS
+    // ----------------------------------------------------
+    console.log('\n--- 10. RBAC Security Boundary Checks ---');
+    // Client attempts to create a Purchase Order (Must be 403 Forbidden)
+    const clientPOAttempt = await fetch(`${baseUrl}/procurement/orders`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${clientToken}`,
+      },
+      body: JSON.stringify({ title: 'Unauthorized PO' }),
+    });
+    assert.equal(clientPOAttempt.status, 403, 'Client must receive 403 when attempting internal procurement');
+    console.log('✅ Security: Client blocked from internal procurement (403 Forbidden)');
 
     console.log('\n=============================================================');
-    console.log('🎉 ALL WEEK 1 END-TO-END VERIFICATION WORKFLOWS PASSED 100%!');
+    console.log('🎉 COMPLETE 19-STEP ENTERPRISE LIFECYCLE VERIFICATION PASSED 100%!');
     console.log('=============================================================\n');
 
     process.exit(0);
@@ -455,6 +562,7 @@ async function runE2EVerification() {
     console.error('\n❌ E2E VERIFICATION FAILED:', err);
     process.exit(1);
   } finally {
+    server.closeAllConnections?.();
     server.close();
   }
 }

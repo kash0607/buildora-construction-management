@@ -1,5 +1,7 @@
 import { projectService } from '../services/projectService.js';
 import { validateProjectInput } from '../validators/projectValidator.js';
+import { logAudit } from '../services/auditService.js';
+import { sendNotification } from '../services/notificationService.js';
 
 /**
  * @desc    Get all projects
@@ -14,7 +16,7 @@ export async function getProjects(req, res, next) {
       manager,
       search,
       includeArchived: includeArchived === 'true',
-    });
+    }, req.user);
 
     return res.status(200).json({
       success: true,
@@ -32,11 +34,18 @@ export async function getProjects(req, res, next) {
  */
 export async function getProject(req, res, next) {
   try {
-    const project = await projectService.getProjectById(req.params.id);
+    const project = await projectService.getProjectById(req.params.id, req.user);
     if (!project) {
       return res.status(404).json({
         success: false,
         message: `Project '${req.params.id}' not found`,
+      });
+    }
+
+    if (project.unauthorized) {
+      return res.status(403).json({
+        success: false,
+        message: 'Forbidden: You do not have permission to access this project',
       });
     }
 
@@ -66,6 +75,30 @@ export async function createProject(req, res, next) {
     }
 
     const project = await projectService.createProject(req.body, req.user?._id);
+
+    await logAudit({
+      user: req.user?._id,
+      userName: req.user?.name || 'System',
+      userRole: req.user?.role || 'System',
+      action: 'CREATE',
+      entity: 'Project',
+      entityId: project.projectId,
+      project: project._id,
+      projectId: project.projectId,
+      details: { name: project.name, budget: project.budget },
+    });
+
+    if (project.clientUser) {
+      await sendNotification({
+        recipient: project.clientUser,
+        targetRole: 'Client',
+        project: project._id,
+        title: 'Project Initialized',
+        message: `Welcome to Buildora! Your project '${project.name}' is now active on your portal.`,
+        type: 'Project',
+        link: '/client-portal',
+      });
+    }
 
     return res.status(201).json({
       success: true,
@@ -101,6 +134,18 @@ export async function updateProject(req, res, next) {
       });
     }
 
+    await logAudit({
+      user: req.user?._id,
+      userName: req.user?.name || 'System',
+      userRole: req.user?.role || 'System',
+      action: 'UPDATE',
+      entity: 'Project',
+      entityId: project.projectId,
+      project: project._id,
+      projectId: project.projectId,
+      details: req.body,
+    });
+
     return res.status(200).json({
       success: true,
       message: 'Project updated successfully',
@@ -125,6 +170,17 @@ export async function deleteProject(req, res, next) {
         message: `Project '${req.params.id}' not found`,
       });
     }
+
+    await logAudit({
+      user: req.user?._id,
+      userName: req.user?.name || 'System',
+      userRole: req.user?.role || 'System',
+      action: 'ARCHIVE',
+      entity: 'Project',
+      entityId: project.projectId,
+      project: project._id,
+      projectId: project.projectId,
+    });
 
     return res.status(200).json({
       success: true,

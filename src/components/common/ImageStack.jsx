@@ -31,7 +31,7 @@ const DEFAULT_STACK_ITEMS = [
     description: 'Real-time slump tests, concrete cube curing telemetry, and digital delivery gate passes.',
     tag: 'Night Pour Telemetry',
     metric: '100% Quality Audited',
-    location: 'Podium B • Skyline Heights',
+    location: 'Podium B • Tower Complex',
     image: '/images/construction_night_skyline.jpg',
     icon: Activity,
     accentColor: '#E0A96D'

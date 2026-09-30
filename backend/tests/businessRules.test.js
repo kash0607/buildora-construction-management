@@ -11,6 +11,9 @@ import {
   validateApprovalTransition,
   calculateStockStatus,
   validateStockIssue,
+  validatePOTransition,
+  calculatePOFulfillmentStatus,
+  validateDeliveryQuantities,
 } from '../services/businessRules.js';
 
 import {
@@ -260,3 +263,53 @@ test('Task Validators: validateTaskInput validates progress range and date order
   assert.ok(invalid.errors.progress);
   assert.ok(invalid.errors.dueDate);
 });
+
+// ==========================================
+// 7. PROCUREMENT & DELIVERY RULES TESTS
+// ==========================================
+test('PO Transition: permits valid sequential workflow transitions', () => {
+  assert.equal(validatePOTransition('Draft', 'Pending Approval').valid, true);
+  assert.equal(validatePOTransition('Pending Approval', 'Approved').valid, true);
+  assert.equal(validatePOTransition('Approved', 'Issued').valid, true);
+  assert.equal(validatePOTransition('Issued', 'Partially Delivered').valid, true);
+  assert.equal(validatePOTransition('Partially Delivered', 'Delivered').valid, true);
+});
+
+test('PO Transition: rejects illegal jump from Draft directly to Delivered', () => {
+  const res = validatePOTransition('Draft', 'Delivered');
+  assert.equal(res.valid, false);
+  assert.match(res.error, /Invalid Purchase Order transition/i);
+});
+
+test('PO Fulfillment: calculates Partial vs Full delivery correctly', () => {
+  const items = [
+    { name: 'Cement OPC 53', quantity: 100, receivedQuantity: 40 },
+    { name: 'Steel TMT 12mm', quantity: 50, receivedQuantity: 0 },
+  ];
+  assert.equal(calculatePOFulfillmentStatus(items), 'Partially Delivered');
+
+  // Second delivery fulfills remainder
+  items[0].receivedQuantity = 100;
+  items[1].receivedQuantity = 50;
+  assert.equal(calculatePOFulfillmentStatus(items), 'Delivered');
+});
+
+test('Delivery Validation: rejects negative quantities and quantity mismatches', () => {
+  const negative = validateDeliveryQuantities([], [
+    { name: 'Cement', receivedQuantity: -5, acceptedQuantity: 0, rejectedQuantity: 0 }
+  ]);
+  assert.equal(negative.valid, false);
+  assert.match(negative.error, /negative/i);
+
+  const mismatch = validateDeliveryQuantities([], [
+    { name: 'Cement', receivedQuantity: 10, acceptedQuantity: 5, rejectedQuantity: 2 } // 5+2 != 10
+  ]);
+  assert.equal(mismatch.valid, false);
+  assert.match(mismatch.error, /must equal received/i);
+
+  const valid = validateDeliveryQuantities([], [
+    { name: 'Cement', receivedQuantity: 10, acceptedQuantity: 8, rejectedQuantity: 2 }
+  ]);
+  assert.equal(valid.valid, true);
+});
+

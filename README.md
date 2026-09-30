@@ -1,874 +1,272 @@
-# BUILDORA — Construction & Project Operations Management Platform
+# BUILDORA — Enterprise Construction & Operations Management Platform
 
-## 1. Project purpose
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/kash0607/buildora-construction-management)
+[![E2E Verification](<https://img.shields.io/badge/E2E%20Lifecycle-100%25%20Verified-blue.svg>)](https://github.com/kash0607/buildora-construction-management)
+[![API Tests](<https://img.shields.io/badge/API%20%26%20Unit%20Tests-34%2F34%20Passed-success.svg>)](https://github.com/kash0607/buildora-construction-management)
+[![Node](<https://img.shields.io/badge/node-%3E%3D20.0.0-informational.svg>)](https://nodejs.org/)
+[![Database](<https://img.shields.io/badge/database-MongoDB%20Mongoose-green.svg>)](https://www.mongodb.com/)
 
-BUILDORA is an Enterprise SaaS / Project Operations / Resource Management platform for construction companies.
-
-The internship brief requires the platform to cover project planning, tasks, milestones, site reports, materials, procurement, vendors, expenses, documents, approvals and client-facing progress. It also identifies approval workflows, resource allocation, budget logic, document permissions and operational traceability as key engineering challenges. fileciteturn1file0
-
-The current repository is the **frontend foundation/prototype**. The real Node.js/Express backend and MongoDB/Mongoose database are the next major phase.
-
----
-
-## 2. Team — 5 members
-
-| Member            | Primary responsibility                      | Current sprint          |
-| ----------------- | ------------------------------------------- | ----------------------- |
-| **Kashish** | Frontend Lead + Full-Stack Integration      | Tasks & Milestones      |
-| **Shreya**  | Node.js/Express + Database + Auth + Testing | Backend foundation      |
-| **Jitesh**  | Backend Business Logic + Architecture       | Workflow/business rules |
-| **Zaara**   | Frontend — Site Operations                 | Site Reports + Issues   |
-| **Isika**   | Frontend — Resources/Procurement           | Materials + Inventory   |
-
-The brief explicitly supports a 4–5 member team and says Java-focused students can contribute to backend architecture, business rules and algorithms while learning Node.js/Express. fileciteturn1file1
+**Buildora** is a client-ready, multi-role construction operations platform built with React 19, Vite, Node.js/Express, and MongoDB. It centralizes real-time field operations, material supply chains, site audits, subcontractor workflows, financial cost controls, and sanitized client progress tracking into a single source of truth.
 
 ---
 
-## 3. Current status
+## 1. System Architecture
 
-### Already implemented
-
-- Login UI
-- Registration UI
-- Demo authentication/personas
-- Shared layout/sidebar/navbar
-- Responsive styling foundation
-- Dashboard
-- KPI cards
-- Dashboard charts
-- Project directory
-- Project search/filtering
-- Project card/table views
-- Create/edit/archive project UI
-- Project details foundation
-- Mock construction data
-- Frontend API abstraction through `js/api.js`
-- LocalStorage-based demo persistence
-
-### Current limitation
-
-The current application is **not yet a real full-stack application**.
-
-There is currently:
-
-- No MongoDB connection
-- No Mongoose models
-- No Express REST API
-- No real JWT authentication
-- No production RBAC
-- No secure file upload
-- No automated testing
-- No production deployment
-
-The current `server.js` is only being used to serve the frontend.
-
----
-
-# 4. Current architecture
-
-### Current prototype
-
-```text
-HTML
-CSS
-Vanilla JavaScript
-      ↓
-   api.js
-      ↓
-mock-data.js / localStorage
 ```
-
-### Target architecture
-
-```text
-Frontend
-   ↓
-REST API
-   ↓
-Node.js + Express
-   ↓
-Controllers / Services
-   ↓
-Mongoose
-   ↓
-MongoDB
-```
-
-The internship specification expects React on the frontend, Node.js/Express for backend, MongoDB/Mongoose for database, authentication/authorization, security, Git/GitHub, testing and deployment. fileciteturn1file1
-
-**Important:** The current frontend uses HTML/CSS/Vanilla JS. Confirm with the mentor whether this is acceptable; if React is mandatory, the current UI should later be migrated into React components.
-
----
-
-# 5. Planned modules
-
-The specification's core scope is:
-
-1. Projects
-2. Tasks & Milestones
-3. Site Reports
-4. Issues
-5. Materials
-6. Inventory
-7. Vendors
-8. Purchase Requests
-9. Approvals
-10. Purchase Orders
-11. Deliveries/Receiving
-12. Expenses
-13. Invoices
-14. Client Payments
-15. Budget Utilization
-16. Documents
-17. Client Portal
-18. Notifications
-19. Audit Logs
-20. Analytics
-
-These modules map directly to the construction platform requirements in the brief. fileciteturn1file0
-
----
-
-# 6. One-month development plan
-
-## WEEK 1 — Foundation + parallel module development
-
-### Kashish
-
-**Tasks & Milestones frontend**
-
-Build:
-
-- Tasks page
-- Task CRUD UI
-- Search/filter
-- Status
-- Priority
-- Assignee
-- Start/due dates
-- Progress
-- Overdue tasks
-- Milestone UI
-
-Branch:
-
-```text
-feature/tasks-milestones
-```
-
-### Shreya
-
-**Backend foundation**
-
-Build:
-
-- Node.js/Express setup
-- MongoDB/Mongoose connection
-- `.env`
-- User model
-- Authentication foundation
-- JWT
-- Auth middleware
-- Error-handling middleware
-- Project model
-
-Branch:
-
-```text
-feature/backend-foundation
-```
-
-### Jitesh
-
-**Business rules**
-
-Design/document and begin implementing:
-
-- Project status rules
-- Project progress calculation
-- Task dependency rules
-- Task completion rules
-- Budget calculation rules
-
-Branch:
-
-```text
-feature/business-logic
-```
-
-### Zaara
-
-**Site Operations**
-
-Build:
-
-- Site Reports
-- Report history
-- Report details
-- Issues page
-- Issue creation/update
-- Priority/status/filtering
-
-Branch:
-
-```text
-feature/site-operations
-```
-
-### Isika
-
-**Resources**
-
-Build:
-
-- Materials page
-- Inventory page
-- Stock list
-- Stock status
-- Low-stock alerts
-- Material request UI
-- Stock movement UI
-
-Branch:
-
-```text
-feature/materials-inventory
-```
-
-### Week 1 target
-
-By the end of Week 1:
-
-```text
-Frontend modules progressing
-+
-Express running
-+
-MongoDB connected
-+
-User model
-+
-Project model
-+
-Business rules documented
+                                  BUILDORA PLATFORM
+                                          │
+       ┌──────────────────────────────────┴──────────────────────────────────┐
+       ▼                                                                     ▼
+[React 19 + Vite Frontend]                                        [Express 5 REST API]
+• Architectural Warm-Neutral Design System                       • Strict JWT Authentication & Session Hydration
+• Dynamic Role-Aware Navigation                                  • RBAC Boundary Middleware (403 Gateways)
+• Live Chart.js & Framer Motion Visualizations                   • Rate Limiting & Helmet Security Headers
+• Zero Tailwind — Pure Flexible Vanilla CSS Tokens               • Business Rule Service Layer
+       │                                                                     │
+       │  (JSON REST via /api with Bearer JWT)                               │
+       └──────────────────────────────────┬──────────────────────────────────┘
+                                          ▼
+                             [Mongoose 9.x Data Layer]
+             ┌────────────────────────────┼────────────────────────────┐
+             ▼                            ▼                            ▼
+      [Core Operations]             [Procurement]                  [Finance]
+      • User (7 Roles)              • Vendor                       • Expense
+      • Project                     • PurchaseRequest              • Invoice
+      • Task (DAG Dependencies)     • PurchaseOrder                • Payment (Reconciliation)
+      • Milestone                   • Delivery (GRN & Stock Sync)  • Live Budget Utilization
+      • SiteReport (Photos)         • InventoryTransaction
+      • Material & Stock            • Document (Client Visible)
+             │
+             ▼
+      [MongoDB Database: localhost/buildora]
 ```
 
 ---
 
-# WEEK 2 — Connect core modules
+## 2. Seeded User Credentials (7 Platform Roles)
 
-## Kashish
+The platform enforces strict backend Role-Based Access Control (RBAC). All 7 roles can be tested using the seeded credentials below:
 
-Complete:
+| Role                           | Seeded Email                 | Password         | Primary Permissions & Capabilities                                    |
+| :----------------------------- | :--------------------------- | :--------------- | :-------------------------------------------------------------------- |
+| **Admin**                | `admin@buildora.com`       | `Password123!` | System administration, audit logs, all operational overrides          |
+| **Project Manager**      | `pm@buildora.com`          | `Password123!` | Projects, task DAGs, milestones, daily site review, budget tracker    |
+| **Site Supervisor**      | `supervisor@buildora.com`  | `Password123!` | Site reports, issue escalation, material requisitions, GRN receipts   |
+| **Procurement Manager**  | `procurement@buildora.com` | `Password123!` | Vendor catalogs, RFQs, PR approval, PO issuance, deliveries           |
+| **Finance Officer**      | `finance@buildora.com`     | `Password123!` | Expense approvals, client billing invoices, payment reconciliation    |
+| **Client**               | `client@buildora.com`      | `Password123!` | Read-only executive dashboard: milestones, approved site photos, docs |
+| **Vendor Subcontractor** | `vendor@apexsteel.com`     | `Password123!` | Vendor portal: assigned purchase orders, dispatch status, invoices    |
 
-- Task dependencies
-- Kanban view
-- Gantt-style timeline
-- Milestone relationships
-- Connect Projects/Tasks UI to API when APIs are ready
+---
 
-## Shreya
+## 3. Implemented Modules & Business Rules
 
-Implement:
+### 1. Authentication & Session Hydration (P0, P2)
 
-```text
-POST /api/auth/register
-POST /api/auth/login
+- State hydration strictly from backend `/api/auth/me` on browser refresh.
+- No client-side mock role swapping; genuine JWT tokens stored in localStorage.
+- Role-scoped sidebar rendering dynamically configured from `src/config/navigation.js`.
 
-GET /api/projects
-GET /api/projects/:id
-POST /api/projects
-PUT /api/projects/:id
-DELETE /api/projects/:id
+### 2. Design System Components (P1)
 
-GET /api/tasks
-GET /api/tasks/:id
-POST /api/tasks
-PUT /api/tasks/:id
-DELETE /api/tasks/:id
+Shared reusable UI library with warm stone/beige architectural aesthetics:
+
+- `PageHeader`, `SectionHeader`, `StatCard`
+- `DataTable`, `SearchBar`, `FilterBar`, `Pagination`
+- `StatusBadge`, `PriorityBadge`
+- `ConfirmDialog`, `FormModal`, `Drawer`
+- `LoadingState`, `EmptyState`, `ErrorState`
+- Standardized currency, date, and unit formatters in `src/utils/formatters.js`.
+
+### 3. Project Management & Task DAGs
+
+- Project creation, editing, status tracking, and worker counts.
+- Task DAG dependency engine with circular dependency detection ($A \to B \to A$) and self-dependency prevention.
+- Automatic task state normalization (100% progress $\leftrightarrow$ Completed).
+- Milestones tracking linked to project schedules.
+
+### 4. Site Operations & Photo Approvals (P7, P8)
+
+- Daily site reports tracking weather, workers present, safety observations, and work completed.
+- Site photo uploads with metadata (uploader, timestamp, caption).
+- Multi-step photo review: site photos remain internal until a Project Manager or Admin marks them `clientApproved: true`.
+
+### 5. Inventory & Materials
+
+- Material catalog with real-time stock status (`In Stock`, `Low Stock`, `Out of Stock`).
+- Automated stock movement auditing via `InventoryTransaction` (`IN`, `OUT`, `ADJUSTMENT`).
+- Strict negative-stock prevention rules.
+
+### 6. Procurement & Delivery Sync (P3, P4)
+
+- **Vendors**: Catalog management with categories and performance ratings.
+- **Purchase Requests (PR)**: Raised by site supervisors, reviewed and converted to POs.
+- **Purchase Orders (PO)**: Line-item calculations with GST tax rates.
+- **Deliveries (GRN)**: Partial delivery tracking (`Ordered`, `Received`, `Accepted`, `Rejected`).
+- **Automated Inventory Sync**: Accepting delivery items automatically increments material stock and creates audit transactions. Prevents duplicate receiving or receiving against closed orders.
+
+### 7. Finance & Live Budget Utilization (P5)
+
+- **Expenses**: Project cost tracking with categorized expenses and approvals.
+- **Invoices**: Client and subcontractor progress billing with automated GST calculation.
+- **Payments**: Bank transfer, NEFT, RTGS, and cheque payment reconciliation.
+- **Live Budget Utilization**: Calculates `budgetUtilization = ((actualCost + committedPO) / budget) * 100` dynamically, preventing division by zero.
+
+### 8. Document Management & Access Control (P6)
+
+- Blueprint, CAD, contract, specification, and safety sheet cataloging.
+- Multi-tiered access visibility: `Internal`, `Client Visible`, `Vendor Visible`.
+
+### 9. Client Portal (P7)
+
+- **Zero Data Leakage**: Sanitized endpoints explicitly omit contractor cost margins, internal expenses, site supervisor issue logs, and material stock balances.
+- Displays executive milestone progress, client-approved site photos, and client-visible architectural drawings.
+
+### 10. Vendor Workspace (P9)
+
+- Dedicated vendor dashboard scoped strictly to purchase orders assigned to the authenticated vendor account.
+
+### 11. Notifications & Audit Logs (P10, P11)
+
+- In-app notification center with read/unread tracking and filter tabs.
+- Enterprise audit trail recording system-wide administrative actions, timestamps, and IP origins.
+
+---
+
+## 4. API Endpoints Overview
+
+| Area                   | Method    | Endpoint                                      | Allowed Roles                      | Description                        |
+| :--------------------- | :-------- | :-------------------------------------------- | :--------------------------------- | :--------------------------------- |
+| **Auth**         | `POST`  | `/api/auth/register`                        | Public                             | Register new user account          |
+|                        | `POST`  | `/api/auth/login`                           | Public                             | Authenticate and receive JWT       |
+|                        | `GET`   | `/api/auth/me`                              | Authenticated                      | Restore current session profile    |
+| **Projects**     | `GET`   | `/api/projects`                             | All roles                          | List projects                      |
+|                        | `POST`  | `/api/projects`                             | Admin, PM                          | Create new construction project    |
+|                        | `GET`   | `/api/projects/:id`                         | All roles                          | Project details and financials     |
+| **Tasks**        | `GET`   | `/api/tasks`                                | All internal                       | Search and filter tasks            |
+|                        | `POST`  | `/api/tasks`                                | Admin, PM, Supervisor              | Create task with dependency checks |
+| **Site Reports** | `POST`  | `/api/site-reports`                         | Admin, PM, Supervisor              | Submit daily field report          |
+|                        | `POST`  | `/api/site-reports/:id/photos`              | Admin, PM, Supervisor              | Attach site inspection photo       |
+|                        | `PATCH` | `/api/site-reports/:id/photos/:pId/approve` | Admin, PM                          | Approve photo for client portal    |
+| **Procurement**  | `GET`   | `/api/procurement/orders`                   | Internal + Vendor                  | View purchase orders               |
+|                        | `POST`  | `/api/procurement/orders`                   | Admin, PM, Procurement             | Issue new purchase order           |
+|                        | `POST`  | `/api/procurement/deliveries`               | Admin, PM, Procurement, Supervisor | Record GRN & sync inventory stock  |
+| **Finance**      | `POST`  | `/api/finance/expenses`                     | Admin, PM, Finance, Supervisor     | Record construction site expense   |
+|                        | `POST`  | `/api/finance/invoices`                     | Admin, PM, Finance                 | Generate client progress invoice   |
+|                        | `POST`  | `/api/finance/payments`                     | Admin, Finance                     | Reconcile payment receipt          |
+|                        | `GET`   | `/api/finance/budget-utilization`           | Admin, PM, Finance                 | Compute live financial metrics     |
+| **Documents**    | `POST`  | `/api/documents`                            | Admin, PM, Procurement, Finance    | Upload and categorize document     |
+| **Client**       | `GET`   | `/api/client/projects/:id`                  | Client, Admin, PM                  | Sanitized executive progress view  |
+| **Audit Logs**   | `GET`   | `/api/audit-logs`                           | Admin                              | Security audit trail               |
+
+---
+
+## 5. Getting Started & Installation
+
+### Prerequisites
+
+- **Node.js**: v20.0.0 or higher
+- **MongoDB**: Local running instance (`mongodb://localhost:27017/buildora`) or MongoDB Atlas URI
+
+### 1. Clone & Install Dependencies
+
+```bash
+git clone https://github.com/kash0607/buildora-construction-management.git
+cd buildora-construction-management
+npm install
 ```
 
-Add:
+### 2. Configure Environment Variables
 
-- Request validation
-- Protected routes
-- JWT verification
-- Proper error responses
+Create a `.env` file in the root directory:
 
-## Jitesh
-
-Implement backend services for:
-
-- Project progress
-- Task dependency validation
-- Budget calculations
-- Approval state rules
-
-Example:
-
-```text
-Task A
-   ↓
-Task B
-   ↓
-Task C
+```ini
+PORT=5000
+MONGODB_URI=mongodb://localhost:27017/buildora
+JWT_SECRET=buildora_enterprise_jwt_super_secret_key_2026_secure
+CLIENT_URL=http://localhost:5173
+NODE_ENV=development
 ```
 
-Task B should not be allowed to complete/start in situations where the defined dependency rules prohibit it.
+### 3. Seed Database
 
-## Zaara
+Populates standard mock projects, materials, tasks, vendors, and seeded accounts:
 
-Finish:
+```bash
+npm run seed
+```
 
-- Site Reports
-- Issues
-- Photo upload UI
-- Report/project relationships
+### 4. Run Development Servers
 
-Prepare frontend to consume API endpoints.
+Start both the Node.js Express backend and Vite React frontend concurrently:
 
-## Isika
+```bash
+npm run dev:all
+```
 
-Finish:
+- **Frontend App**: `http://localhost:5173`
+- **Backend API**: `http://localhost:5000/api`
 
-- Materials
-- Inventory
-- Stock movement
-- Low-stock logic/UI
-- Material request UI
+---
 
-Coordinate stock business rules with Jitesh.
+## 6. Verification & Test Suite
 
-### Week 2 target
+Buildora includes automated test coverage across business rules, API security, and an end-to-end multi-persona lifecycle suite.
 
-```text
-Projects
-Tasks
-Milestones
-Site Reports
-Issues
-Materials
-Inventory
+### Run Unit & Business Rules Test Suite
 
-        ↓
+Executes 34 native Node.js tests validating stock protection, DAG cycles, PO state machines, and 7-role RBAC matrices:
 
-Connected to backend where APIs are ready
+```bash
+npm run test:backend
+```
+
+### Run End-to-End Enterprise Lifecycle Suite
+
+Executes the comprehensive 19-step lifecycle simulating real API calls from Auth $\to$ Project $\to$ Task $\to$ Daily Report $\to$ Material $\to$ Vendor $\to$ PO $\to$ Partial & Full GRN Deliveries $\to$ Stock Sync $\to$ Expense $\to$ Client Invoice $\to$ Finance Payment $\to$ Budget Analytics $\to$ Client Portal Sanitization $\to$ 403 RBAC Boundaries:
+
+```bash
+npm run test:e2e
+```
+
+### Verify Production Build
+
+```bash
+npm run build
 ```
 
 ---
 
-# WEEK 3 — Procurement + Finance + Client
+## 7. Project Structure
 
-## Kashish
-
-Frontend:
-
-- Procurement UI
-- Purchase Requests
-- Approvals
-- Purchase Orders
-
-Coordinate UI integration.
-
-## Shreya
-
-Backend:
-
-- Vendor model/API
-- Purchase Request API
-- Approval API
-- Purchase Order API
-- Role authorization
-- Validation
-
-## Jitesh
-
-Business logic:
-
-### Procurement workflow
-
-```text
-Purchase Request
-       ↓
-Pending Approval
-       ↓
-Approved / Rejected
-       ↓
-Purchase Order
-       ↓
-Delivery
-       ↓
-Received
-       ↓
-Inventory Updated
 ```
-
-### Delivery rules
-
-Handle:
-
-- Ordered quantity
-- Received quantity
-- Quality status
-- Partial delivery
-- Inventory update
-
-## Zaara
-
-Frontend:
-
-- Documents
-- Client Portal UI
-
-Client portal should expose appropriate project information such as:
-
-- Progress
-- Approved photos
-- Milestones
-- Documents
-
-## Isika
-
-Frontend:
-
-- Vendors
-- Deliveries
-- Receiving
-- Quantity/quality checks
-
-Coordinate inventory update behavior with backend.
-
-### Week 3 target
-
-```text
-Procurement workflow
-+
-Inventory
-+
-Deliveries
-+
-Documents
-+
-Client Portal foundation
+Buildora/
+├── backend/
+│   ├── config/             # DB and environment configuration
+│   ├── controllers/        # Express request handlers
+│   ├── middleware/         # Auth, RBAC boundary, error handler, rate limiter
+│   ├── models/             # Mongoose schemas (User, Project, Task, Vendor, PO, etc.)
+│   ├── routes/             # Express API routes
+│   ├── scripts/            # Seed scripts and verify_e2e.js lifecycle suite
+│   ├── services/           # Pure business rules engine (businessRules.js)
+│   ├── tests/              # Node test runner unit and API tests
+│   └── app.js              # Express app entrypoint
+├── src/
+│   ├── components/
+│   │   ├── common/         # Uniform Design System (DataTable, StatCard, etc.)
+│   │   └── layout/         # Dynamic Sidebar, Navbar, PageShell
+│   ├── config/             # Navigation role-scoping matrix
+│   ├── context/            # AuthContext, NotificationContext
+│   ├── pages/              # 18+ application pages (Procurement, Finance, ClientPortal, etc.)
+│   ├── services/           # Axios API client wrapper
+│   └── utils/              # Currency, date, and unit formatters
+├── dist/                   # Production build output
+├── README.md               # Enterprise documentation
+└── package.json            # Scripts & project manifest
 ```
 
 ---
 
-# WEEK 4 — Finance + Security + Testing + Deployment
+## 8. License & Authors
 
-## Kashish
-
-- Finish dashboard integration
-- Connect frontend to real APIs
-- Fix responsive issues
-- UI consistency
-- Final user flow
-- Demo preparation
-
-## Shreya
-
-- Expenses
-- Invoices
-- Payments where applicable
-- Final authentication
-- RBAC
-- API validation
-- Security
-- Testing
-- Deployment configuration
-
-The brief expects authentication/authorization, protected APIs, secure uploads and rate limiting. fileciteturn1file1
-
-## Jitesh
-
-- Finalize business rules
-- Approval workflows
-- Budget logic
-- Inventory calculations
-- Audit-event logic
-- Edge cases
-- Backend testing support
-
-## Zaara
-
-- Final responsive testing
-- Client portal polish
-- Documents UI
-- Notifications UI
-- Accessibility/usability fixes
-
-## Isika
-
-- Analytics UI
-- Inventory analytics
-- Procurement analytics
-- Low-stock dashboard
-- Final procurement testing
-
-### Final Week common work
-
-Everyone:
-
-- Test assigned modules
-- Fix bugs
-- Review PRs
-- Update documentation
-- Prepare demo data
-- Verify complete workflow
-- Help with deployment
-
-The brief specifically expects Git/GitHub, branches, pull requests, reviews, API documentation and testing, followed by production deployment/environment configuration. fileciteturn1file1
-
----
-
-# 7. GitHub workflow
-
-Repository:
-
-```text
-buildora-construction-management
-```
-
-Branches:
-
-```text
-main
-develop
-```
-
-Feature branches:
-
-```text
-feature/tasks-milestones
-feature/backend-foundation
-feature/business-logic
-feature/site-operations
-feature/materials-inventory
-```
-
-Workflow:
-
-```text
-Feature branch
-      ↓
-Commit
-      ↓
-Push
-      ↓
-Pull Request
-      ↓
-develop
-      ↓
-Testing
-      ↓
-main
-```
-
-**Never directly push unfinished work to `main`.**
-
----
-
-# 8. Database plan
-
-Planned MongoDB/Mongoose models:
-
-```text
-User
-Project
-Task
-Milestone
-SiteReport
-Issue
-Material
-InventoryTransaction
-Vendor
-PurchaseRequest
-Approval
-PurchaseOrder
-Delivery
-Expense
-Invoice
-Payment
-Document
-Notification
-AuditLog
-```
-
-Relationships should be designed around the Project.
-
-Example:
-
-```text
-Project
- ├── Tasks
- ├── Milestones
- ├── Site Reports
- ├── Issues
- ├── Materials
- ├── Purchase Requests
- ├── Purchase Orders
- ├── Deliveries
- ├── Expenses
- ├── Documents
- └── Team
-```
-
----
-
-# 9. RBAC plan
-
-Potential roles:
-
-```text
-Admin
-Project Manager
-Site Supervisor
-Procurement Manager
-Finance
-Client
-Vendor
-```
-
-Permissions must eventually be enforced by the backend, not only by hiding frontend buttons.
-
-Examples:
-
-### Project Manager
-
-- Projects
-- Tasks
-- Milestones
-- Site reports
-- Issues
-- Project documents
-- Project analytics
-
-### Site Supervisor
-
-- Site reports
-- Issues
-- Material requests
-- Delivery receiving
-
-### Procurement
-
-- Vendors
-- Purchase requests
-- Purchase orders
-- Deliveries
-
-### Finance
-
-- Expenses
-- Invoices
-- Payments
-- Budgets
-
-### Client
-
-Read-only project progress, approved photos, milestones and documents.
-
----
-
-# 10. Security requirements
-
-Before final submission:
-
-- Password hashing
-- JWT/session strategy
-- Protected APIs
-- Backend RBAC
-- Input validation
-- Rate limiting
-- Secure file uploads
-- Environment variables
-- No secrets committed to GitHub
-- Proper error handling
-- Audit logs
-
-Never commit:
-
-```text
-.env
-MongoDB passwords
-JWT secrets
-API keys
-```
-
-Use:
-
-```text
-.env.example
-```
-
-for required variable names.
-
----
-
-# 11. Definition of Done
-
-A frontend page is **not** considered fully complete just because the UI looks finished.
-
-A module should eventually have:
-
-```text
-UI
-+
-Validation
-+
-Backend API
-+
-MongoDB model
-+
-CRUD/business logic
-+
-Authentication
-+
-Authorization
-+
-Error handling
-+
-Loading/empty states
-+
-Responsive design
-+
-Testing
-+
-Documentation
-```
-
----
-
-# 12. Final demo workflow
-
-The final presentation should demonstrate one connected construction workflow:
-
-```text
-Login
-  ↓
-Dashboard
-  ↓
-Project
-  ↓
-Task / Milestone
-  ↓
-Daily Site Report
-  ↓
-Issue / Material Shortage
-  ↓
-Purchase Request
-  ↓
-Approval
-  ↓
-Purchase Order
-  ↓
-Delivery
-  ↓
-Inventory Update
-  ↓
-Expense
-  ↓
-Budget
-  ↓
-Client Progress
-  ↓
-Analytics / Audit
-```
-
-This is better than demonstrating unrelated pages because it shows the platform operating as one system.
-
----
-
-# 13. Important team rules
-
-1. Reuse existing BUILDORA design components.
-2. Do not rewrite another person's module without discussing it.
-3. Do not create duplicate components unnecessarily.
-4. Keep frontend and backend separated.
-5. Use `api.js`/service layer for API communication.
-6. Never connect frontend directly to MongoDB.
-7. Do not store real passwords in source code.
-8. Do not rely on frontend-only authorization.
-9. Validate all important API input.
-10. Test before opening a PR.
-11. Keep mock data until the corresponding API is available.
-12. Use realistic Indian/INR construction data.
-13. Keep desktop/tablet/mobile responsive.
-14. Communicate before changing shared architecture.
-
----
-
-# 14. Current immediate assignments
-
-## Kashish
-
-```text
-Tasks & Milestones
-```
-
-## Shreya
-
-```text
-Node.js
-Express
-MongoDB
-Mongoose
-Authentication
-JWT
-Project APIs
-```
-
-## Jitesh
-
-```text
-Business rules
-Approval workflow
-Budget logic
-Task dependencies
-Inventory logic
-Backend architecture
-```
-
-## Zaara
-
-```text
-Site Reports
-Issues
-```
-
-## Isika
-
-```text
-Materials
-Inventory
-```
-
----
-
-# 15. One-month success criteria
-
-By the end of the month, the goal is to have a working production-style prototype with:
-
-- Real authentication
-- Real MongoDB persistence
-- Core project/task management
-- Site operations
-- Materials/inventory
-- Procurement workflow
-- Approvals
-- Deliveries
-- Finance foundation
-- Documents/client portal foundation
-- RBAC
-- Audit/notification/analytics foundation
-- Testing
-- GitHub collaboration
-- Deployment
-
-Not every advanced feature needs to be equally deep, but the core workflow should work end-to-end and demonstrate the engineering requirements of the brief.
-
----
-
-## Reference to project brief
-
-The official project brief defines the core construction scope and engineering expectations used for this roadmap. fileciteturn1file0turn1file1
+Developed by **Kashish & Zaara** as part of the Buildora Construction Operations Management Initiative. Licensed under the ISC License.

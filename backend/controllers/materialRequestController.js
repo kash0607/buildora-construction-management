@@ -36,11 +36,18 @@ export async function createMaterialRequest(req, res, next) {
       });
     }
 
+    if (!projectId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Project ID is required for material requests.',
+      });
+    }
+
     const request = await inventoryService.createMaterialRequest(
       {
         materialName,
-        projectId: projectId || 'PRJ-101',
-        projectName: projectName || 'Site Project',
+        projectId,
+        projectName: projectName || '',
         quantity: Number(quantity),
         unit: unit || 'units',
         requiredByDate,

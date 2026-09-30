@@ -1,24 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { api, getAuthToken, setAuthToken } from '../services/api';
 
-export const SYSTEM_ROLES = [
-  { id: 'project-manager', name: 'Project Manager', description: 'Manage projects, schedules, budgets & approvals' },
-  { id: 'admin', name: 'Admin', description: 'Full enterprise access & governance' },
-  { id: 'site-supervisor', name: 'Site Supervisor', description: 'Daily site logs, worker counts & material receipts' },
-  { id: 'procurement-manager', name: 'Procurement Manager', description: 'Vendors, RFQs, Purchase Orders & deliveries' },
-  { id: 'finance', name: 'Finance', description: 'Budget allocation, disbursements & invoice audits' },
-  { id: 'client', name: 'Client', description: 'Executive milestones, approved photos & progress' },
-];
-
-export const SEEDED_DEMO_USERS = [
-  { email: 'kashish.pm@buildora.com', name: 'Kashish Patel', role: 'Project Manager', avatar: 'KP' },
-  { email: 'admin@buildora.com', name: 'Vikram Malhotra', role: 'Admin', avatar: 'VM' },
-  { email: 'sanjay.site@buildora.com', name: 'Sanjay Verma', role: 'Site Supervisor', avatar: 'SV' },
-  { email: 'finance@buildora.com', name: 'Ananya Iyer', role: 'Finance', avatar: 'AI' },
-  { email: 'procurement@buildora.com', name: 'Rohan Gupta', role: 'Procurement Manager', avatar: 'RG' },
-  { email: 'client.rep@lodha.com', name: 'Rajesh Oberoi', role: 'Client', avatar: 'RO' },
-];
-
 const AuthContext = createContext(null);
 const SESSION_KEY = 'buildora_auth_session';
 
@@ -35,10 +17,7 @@ export function AuthProvider({ children }) {
 
   const [loading, setLoading] = useState(true);
 
-  const demoUsers = SEEDED_DEMO_USERS;
-  const roles = SYSTEM_ROLES;
-
-  // Verify and hydrate current user from backend /api/auth/me on mount/refresh
+  // Hydrate & verify authenticated user session from backend /api/auth/me
   useEffect(() => {
     let isMounted = true;
 
@@ -125,13 +104,7 @@ export function AuthProvider({ children }) {
   const logout = () => {
     api.logout();
     setCurrentUser(null);
-  };
-
-  const switchRole = (roleName) => {
-    if (!currentUser) return;
-    const updated = { ...currentUser, role: roleName };
-    setCurrentUser(updated);
-    localStorage.setItem(SESSION_KEY, JSON.stringify(updated));
+    localStorage.removeItem(SESSION_KEY);
   };
 
   return (
@@ -139,12 +112,9 @@ export function AuthProvider({ children }) {
       value={{
         currentUser,
         loading,
-        demoUsers,
-        roles,
         login,
         register,
         logout,
-        switchRole,
       }}
     >
       {children}
