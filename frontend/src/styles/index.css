@@ -1,0 +1,24 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import './style.css';
+@import './components.css';
+@import './layout.css';
+@import './forms.css';
+@import './dashboard.css';
+@import './projects.css';
+@import './tasks.css';
+@import './site-reports.css';
+@import './issues.css';
+@import './materials.css';
+@import './inventory.css';
+@import './responsive.css';
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
